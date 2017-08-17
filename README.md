@@ -38,7 +38,7 @@ const axios = require('axios');
 
 app.use(async (req, res, next) => {
   // Check some condition.
-  if (req.get('user-agent').includes('Facebot')) {
+  if (!req.get('user-agent').includes('Facebot')) {
     return next();
   }
 
