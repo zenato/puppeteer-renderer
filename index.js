@@ -22,7 +22,7 @@ http.createServer(async (req, res) => {
     res.writeHead(200, header);
     res.end(html);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     res.writeHead(500, header);
     res.end('Oops, An expected error seems to have occurred.');
   }
