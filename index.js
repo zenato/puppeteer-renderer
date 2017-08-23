@@ -15,8 +15,8 @@ const header = {
     const { query } = url.parse(req.url, true);
 
     if (!query.url) {
-      res.writeHead(404, header);
-      res.end('Page not found.');
+      res.writeHead(400, header);
+      res.end('Search with url parameter. For eaxample, ?url=http://yourdomain');
       return;
     }
 
@@ -33,3 +33,4 @@ const header = {
     console.log(`Listen port on ${port}.`);
   });
 })();
+
