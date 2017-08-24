@@ -8,8 +8,8 @@ const header = {
   'Content-Type': 'text/plain; charset=UTF-8',
 };
 
-(async function () {
-  const render = await renderer();
+renderer().then((render) => {
+  console.log('Initialized renderer.');
 
   http.createServer(async (req, res) => {
     const { query } = url.parse(req.url, true);
@@ -32,5 +32,4 @@ const header = {
   }).listen(port, () => {
     console.log(`Listen port on ${port}.`);
   });
-})();
-
+});

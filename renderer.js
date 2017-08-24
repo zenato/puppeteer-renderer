@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 
 async function create() {
   const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-  console.log('Initialized renderer.');
 
   return async function (url) {
     const page = await browser.newPage();
