@@ -8,7 +8,7 @@ const app = express();
 // Configure.
 app.disable('x-powered-by');
 
-let render = null;
+let renderer = null;
 
 // Index page.
 app.get('/', (req, res) => {
@@ -22,7 +22,7 @@ app.get('/render', async (req, res, next) => {
   }
 
   try {
-    const html = await render(req.query.url);
+    const html = await renderer.render(req.query.url);
     res.status(200).send(html);
   } catch (e) {
     next(e);
@@ -42,7 +42,7 @@ app.use((err, req, res, next) => {
 
 // Create renderer and start server.
 createRenderer().then((createdRender) => {
-  render = createdRender;
+  renderer = createdRender;
   console.info('Initialized renderer.');
 
   app.listen(port, () => {

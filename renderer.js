@@ -1,10 +1,12 @@
 const puppeteer = require('puppeteer');
 
-async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+class Renderer {
+  constructor(browser) {
+    this.browser = browser;
+  }
 
-  return async function (url) {
-    const page = await browser.newPage();
+  async render(url) {
+    const page = await this.browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle' });
 
     const html = await page.evaluate(() => {
@@ -14,6 +16,11 @@ async function create() {
     await page.close();
     return html;
   }
+}
+
+async function create() {
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+  return new Renderer(browser);
 }
 
 module.exports = create;
