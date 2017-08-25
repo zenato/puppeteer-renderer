@@ -1,35 +1,28 @@
-const http = require('http');
-const url = require('url');
+const express = require('express');
 const renderer = require('./renderer');
 
 const port = process.env.PORT || 3000;
 
-const header = {
-  'Content-Type': 'text/plain; charset=UTF-8',
-};
+const app = express();
 
 renderer().then((render) => {
   console.log('Initialized renderer.');
 
-  http.createServer(async (req, res) => {
-    const { query } = url.parse(req.url, true);
-
-    if (!query.url) {
-      res.writeHead(400, header);
-      res.end('Search with url parameter. For eaxample, ?url=http://yourdomain');
-      return;
+  app.use(async (req, res) => {
+    if (!req.query.url) {
+      return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain');
     }
 
     try {
-      const html = await render(query.url);
-      res.writeHead(200, header);
-      res.end(html);
+      const html = await render(req.query.url);
+      res.status(200).send(html);
     } catch (e) {
       console.log(e);
-      res.writeHead(500, header);
-      res.end('Oops, An expected error seems to have occurred.');
+      res.status(500).send('Oops, An expected error seems to have occurred.');
     }
-  }).listen(port, () => {
+  });
+
+  app.listen(port, () => {
     console.log(`Listen port on ${port}.`);
   });
 });
