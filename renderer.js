@@ -5,16 +5,26 @@ class Renderer {
     this.browser = browser;
   }
 
-  async render(url) {
+  async createPage(url) {
     const page = await this.browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle' });
+    return page;
+  }
 
+  async render(url) {
+    const page = await this.createPage(url);
     const html = await page.evaluate(() => {
       return document.documentElement.outerHTML;
     });
 
     await page.close();
     return html;
+  }
+
+  async pdf(url) {
+    const page = await this.createPage(url);
+    const buffer = await page.pdf({ format: 'A4' });
+    return buffer;
   }
 }
 

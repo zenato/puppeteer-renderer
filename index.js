@@ -3,35 +3,31 @@ const createRenderer = require('./renderer');
 
 const port = process.env.PORT || 3000;
 
+let renderer = null;
+
 const app = express();
 
 // Configure.
 app.disable('x-powered-by');
 
-let renderer = null;
-
-// Index page.
-app.get('/', (req, res) => {
-  res.redirect('/render');
-});
-
 // Render url.
-app.get('/render', async (req, res, next) => {
+app.use(async (req, res, next) => {
   if (!req.query.url) {
     return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain');
   }
 
   try {
-    const html = await renderer.render(req.query.url);
-    res.status(200).send(html);
+    if (req.query.type === 'pdf') {
+      const buffer = await renderer.pdf(req.query.url);
+      res.setHeader('Content-type', 'application/pdf');
+      res.send(buffer);
+    } else {
+      const html = await renderer.render(req.query.url);
+      res.status(200).send(html);
+    }
   } catch (e) {
     next(e);
   }
-});
-
-// Page not found.
-app.use((req, res) => {
-  res.status(404).send('Page not found.');
 });
 
 // Error page.

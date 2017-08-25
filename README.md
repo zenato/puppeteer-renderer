@@ -23,7 +23,7 @@ You can run Chromium or docker.
 `docker run -d --name renderer -p 8080:3000 zenato/puppeteer-renderer`
 
 ### Test on your browser
-Input url `http://localhost:{port}/render?url=https://www.google.com`
+Input url `http://localhost:{port}/?url=https://www.google.com`
 
 If you can see html code, server works fine.
 
