@@ -6,7 +6,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 createRenderer().then((render) => {
-  console.log('Initialized renderer.');
+  console.info('Initialized renderer.');
 
   app.use(async (req, res) => {
     if (!req.query.url) {
@@ -17,12 +17,12 @@ createRenderer().then((render) => {
       const html = await render(req.query.url);
       res.status(200).send(html);
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.status(500).send('Oops, An expected error seems to have occurred.');
     }
   });
 
   app.listen(port, () => {
-    console.log(`Listen port on ${port}.`);
+    console.info(`Listen port on ${port}.`);
   });
 });
