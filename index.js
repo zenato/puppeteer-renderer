@@ -3,10 +3,10 @@ const createRenderer = require('./renderer');
 
 const port = process.env.PORT || 3000;
 
-const app = express();
-
 createRenderer().then((render) => {
   console.info('Initialized renderer.');
+
+  const app = express();
 
   app.use(async (req, res) => {
     if (!req.query.url) {
@@ -25,4 +25,6 @@ createRenderer().then((render) => {
   app.listen(port, () => {
     console.info(`Listen port on ${port}.`);
   });
+}).catch((e) => {
+  console.error('Fail to initialze renderer.', e);
 });
