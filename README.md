@@ -49,3 +49,11 @@ app.use(async (req, res, next) => {
 
 app.listen(8080);
 ```
+
+## API
+
+| Name  | Required | Value   | Description            |Usage                                                   |
+|-------|:--------:|:-------:|------------------------|--------------------------------------------------------|
+|url    |O         |         |Target URL              |http://puppeterr-renderer?url=http://www.google.com         |
+|type   |          |(pdf)    |Rendering another type. |http://puppeterr-renderer?url=http://www.google.com&type=pdf|
+
