@@ -1,11 +1,11 @@
 const express = require('express');
-const renderer = require('./renderer');
+const createRenderer = require('./renderer');
 
 const port = process.env.PORT || 3000;
 
 const app = express();
 
-renderer().then((render) => {
+createRenderer().then((render) => {
   console.log('Initialized renderer.');
 
   app.use(async (req, res) => {
