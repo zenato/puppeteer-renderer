@@ -11,6 +11,6 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.15.4",
-    "puppeteer": "^0.9.0"
+    "puppeteer": "^0.10.1"
   }
 }
