@@ -1,9 +1,9 @@
-#puppeteer-renderer-middleware
+# puppeteer-renderer-middleware
 
 An Express middleware for [puppeteer-renderer](http://github.com/zenato/puppeteer-renderer).
 
 
-##Usage
+## Usage
 
 ```bash
 $ npm install --save express puppeteer-renderer-middleware
@@ -27,7 +27,7 @@ app.use(puppeteerRenderer({
 app.listen(8080);
 ```
 
-##Configuration
+## Configuration
 
 | Property | Default | Description |
 | -------- | ------- | ----------- |
