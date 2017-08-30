@@ -32,6 +32,6 @@ app.listen(8080);
 | Property | Default | Description |
 | -------- | ------- | ----------- |
 | `url` | *Required* | puppeteer-renderer public url |
-| `userAgentPattern` | Match user agent pattern |
-| `excludeUrlPattern` | Exclude url pattern |
+| `userAgentPattern` | |Match user agent pattern |
+| `excludeUrlPattern` | |Exclude url pattern |
 | `timeout` | `10 * 1000` | Timeout ms |
