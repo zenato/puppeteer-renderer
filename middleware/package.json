@@ -1,0 +1,12 @@
+{
+  "name": "puppeteer-renderer-middleware",
+  "author": "yeongjinnn@gmail.com",
+  "version": "0.1.0",
+  "description": "An Express middleware for puppeteer-renderer",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "puppeteer": "^0.10.1"
+  }
+}
