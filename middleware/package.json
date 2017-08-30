@@ -1,6 +1,14 @@
 {
   "name": "puppeteer-renderer-middleware",
-  "author": "yeongjinnn@gmail.com",
+  "author": {
+    "name": "Yeongjin Lee",
+    "email": "yeongjinnn@gmail.com",
+    "url": "https://github.com/zenato"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zenato/puppeteer-renderer"
+  },
   "version": "0.1.0",
   "description": "An Express middleware for puppeteer-renderer",
   "main": "index.js",
