@@ -10,4 +10,3 @@ describe('Renderer', function() {
     expect(html).to.be.a('string');
   });
 });
-
