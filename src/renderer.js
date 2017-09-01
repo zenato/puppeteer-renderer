@@ -12,19 +12,32 @@ class Renderer {
   }
 
   async render(url) {
-    const page = await this.createPage(url);
-    const html = await page.evaluate(() => {
-      return document.documentElement.outerHTML;
-    });
+    let page = null;
+    try {
+      page = await this.createPage(url);
+      const html = await page.evaluate(() => {
+        return document.documentElement.outerHTML;
+      });
+      return html;
+    } finally {
+      if (page) {
+        await page.close();
+      }
+    }
 
-    await page.close();
-    return html;
   }
 
   async pdf(url) {
-    const page = await this.createPage(url);
-    const buffer = await page.pdf({ format: 'A4' });
-    return buffer;
+    let page = null;
+    try {
+      page = await this.createPage(url);
+      const buffer = await page.pdf({ format: 'A4' });
+      return buffer;
+    } finally {
+      if (page) {
+        await page.close();
+      }
+    }
   }
 }
 
