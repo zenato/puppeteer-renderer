@@ -1,3 +1,5 @@
+'use strict';
+
 const puppeteer = require('puppeteer');
 
 class Renderer {
@@ -24,7 +26,6 @@ class Renderer {
         await page.close();
       }
     }
-
   }
 
   async pdf(url) {
