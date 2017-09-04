@@ -3,13 +3,14 @@
 const { expect } = require('chai');
 const createRenderer = require('../src/renderer');
 
-describe('Renderer', function () {
-  let renderer = null;
+let renderer = null;
 
-  before(async () => {
-    this.timeout(10 * 1000);
-    renderer = await createRenderer();
-  });
+before(async () => {
+  renderer = await createRenderer();
+});
+
+describe('Renderer', function () {
+  this.timeout(10 * 1000);
 
   it('should take rendered HTML code', async () => {
     const html = await renderer.render('http://www.google.com');
