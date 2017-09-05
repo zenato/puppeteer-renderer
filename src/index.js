@@ -14,24 +14,30 @@ app.disable('x-powered-by');
 
 // Render url.
 app.use(async (req, res, next) => {
-  if (!req.query.url) {
+  let url = req.query.url;
+
+  if (!url) {
     return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain');
+  }
+
+  if (!url.includes('://')) {
+    url = `http://${url}`;
   }
 
   try {
     switch (req.query.type) {
       case 'pdf':
-        const pdf = await renderer.pdf(req.query.url);
+        const pdf = await renderer.pdf(url);
         res.set('Content-type', 'application/pdf').send(pdf);
         break;
 
       case 'screenshot':
-        const image = await renderer.screenshot(req.query.url);
+        const image = await renderer.screenshot(url);
         res.set('Content-type', 'image/png').send(image);
         break;
 
       default:
-        const html = await renderer.render(req.query.url);
+        const html = await renderer.render(url);
         res.status(200).send(html);
     }
   } catch (e) {
