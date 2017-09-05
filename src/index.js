@@ -23,12 +23,14 @@ app.use(async (req, res, next) => {
       case 'pdf':
         const pdf = await renderer.pdf(req.query.url);
         res.set('Content-type', 'application/pdf');
-        return res.send(pdf);
+        res.send(pdf);
+        break;
 
       case 'screenshot':
         const image = await renderer.screenshot(req.query.url);
         res.set('Content-type', 'image/png');
-        return res.send(image);
+        res.send(image);
+        break;
 
       default:
         const html = await renderer.render(req.query.url);
