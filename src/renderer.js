@@ -40,6 +40,19 @@ class Renderer {
       }
     }
   }
+
+  async screenshot(url) {
+    let page = null;
+    try {
+      page = await this.createPage(url);
+      const buffer = await page.screenshot({ fullPage: true });
+      return buffer;
+    } finally {
+      if (page) {
+        await page.close();
+      }
+    }
+  }
 }
 
 async function create() {

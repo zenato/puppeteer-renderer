@@ -19,13 +19,20 @@ app.use(async (req, res, next) => {
   }
 
   try {
-    if (req.query.type === 'pdf') {
-      const buffer = await renderer.pdf(req.query.url);
-      res.setHeader('Content-type', 'application/pdf');
-      res.send(buffer);
-    } else {
-      const html = await renderer.render(req.query.url);
-      res.status(200).send(html);
+    switch (req.query.type) {
+      case 'pdf':
+        const pdf = await renderer.pdf(req.query.url);
+        res.setHeader('Content-type', 'application/pdf');
+        return res.send(pdf);
+
+      case 'screenshot':
+        const image = await renderer.screenshot(req.query.url);
+        res.setHeader('Content-type', 'image/png');
+        return res.send(image);
+
+      default:
+        const html = await renderer.render(req.query.url);
+        res.status(200).send(html);
     }
   } catch (e) {
     next(e);
