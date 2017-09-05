@@ -55,5 +55,5 @@ app.listen(8080);
 | Name  | Required | Value   | Description            |Usage                                                   |
 |-------|:--------:|:-------:|------------------------|--------------------------------------------------------|
 |url    |O         |         |Target URL              |http://puppeterr-renderer?url=http://www.google.com         |
-|type   |          |(pdf|screenshot)    |Rendering another type. |http://puppeterr-renderer?url=http://www.google.com&type=pdf|
+|type   |          |(pdf\|screenshot)    |Rendering another type. |http://puppeterr-renderer?url=http://www.google.com&type=pdf|
 
