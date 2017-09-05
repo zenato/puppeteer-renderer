@@ -17,9 +17,7 @@ class Renderer {
     let page = null;
     try {
       page = await this.createPage(url);
-      const html = await page.evaluate(() => {
-        return document.documentElement.outerHTML;
-      });
+      const html = await page.content();
       return html;
     } finally {
       if (page) {
