@@ -5,9 +5,9 @@ const createRenderer = require('./renderer');
 
 const port = process.env.PORT || 3000;
 
-let renderer = null;
-
 const app = express();
+
+let renderer = null;
 
 // Configure.
 app.disable('x-powered-by');
@@ -52,8 +52,8 @@ app.use((err, req, res, next) => {
 });
 
 // Create renderer and start server.
-createRenderer().then((createdRender) => {
-  renderer = createdRender;
+createRenderer().then((createdRenderer) => {
+  renderer = createdRenderer;
   console.info('Initialized renderer.');
 
   app.listen(port, () => {
