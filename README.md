@@ -27,25 +27,24 @@ Input url `http://localhost:{port}/?url=https://www.google.com`
 
 If you can see html code, server works fine.
 
-### Set proxy on your own service server
+## Integration exists your service.
 
-If you have active service, Please set proxy confuration.
+If you have active service, set proxy configuration with middleware.
+See [puppeteer-renderer-middleware](middleware/README.md) for express.
 
-For example (Used express.js)
 ```js
-const app = require('express')();
-const axios = require('axios');
+const renderer = require('puppeteer-renderer-middleware');
 
-app.use(async (req, res, next) => {
-  // Check some condition.
-  if (!req.get('user-agent').includes('Facebot')) {
-    return next();
-  }
+const app = express();
 
-  const url = encodeURIComponent(`http://current-service-host:port${req.originalUrl}`);
-  const { data } = await axios.get(`http://puppet-renderer-server:port?url=${url}`);
-  res.send(data);
-});
+app.use(renderer({
+  url: 'http://installed-your-puppeterr-renderer-host/render',
+  // userAgentPattern: /My-Custom-Agent/i,
+  // excludeUrlPattern: /*.html$/i
+  // timeout: 30 * 1000,
+}));
+
+// your service logics..
 
 app.listen(8080);
 ```
