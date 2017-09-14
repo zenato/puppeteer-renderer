@@ -27,7 +27,7 @@ Input url `http://localhost:{port}/?url=https://www.google.com`
 
 If you can see html code, server works fine.
 
-## Integration exists your service.
+## Integration with existing service.
 
 If you have active service, set proxy configuration with middleware.
 See [puppeteer-renderer-middleware](middleware/README.md) for express.
