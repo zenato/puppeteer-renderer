@@ -38,7 +38,7 @@ const renderer = require('puppeteer-renderer-middleware');
 const app = express();
 
 app.use(renderer({
-  url: 'http://installed-your-puppeterr-renderer-host/render',
+  url: 'http://installed-your-puppeterr-renderer-url',
   // userAgentPattern: /My-Custom-Agent/i,
   // excludeUrlPattern: /*.html$/i
   // timeout: 30 * 1000,
