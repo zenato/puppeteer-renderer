@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/zenato/puppeteer-renderer"
   },
-  "homepage": "https://github.com/zenato/puppeteer-renderer",
+  "homepage": "https://github.com/zenato/puppeteer-renderer/tree/master/middleware",
   "version": "0.2.0",
   "description": "An Express middleware for puppeteer-renderer",
   "main": "./dist/index.js",
