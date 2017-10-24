@@ -1,6 +1,4 @@
-'use strict';
-
-const axios = require('axios');
+import axios from 'axios';
 
 const botUserAgents = [
   'W3C_Validator',
@@ -40,7 +38,7 @@ module.exports = function (options) {
   const excludeUrlPattern = options.excludeUrlPattern || new RegExp(`\\.(${staticFileExtensions.join('|')})$`, 'i');
   const timeout = options.timeout || (10 * 1000);
 
-  return function (req, res, next) {
+  return (req, res, next) => {
     if (isRender) return next();
     isRender = true;
 
@@ -59,3 +57,4 @@ module.exports = function (options) {
 
 exports.botUserAgents = botUserAgents;
 exports.staticFileExtensions = staticFileExtensions;
+
