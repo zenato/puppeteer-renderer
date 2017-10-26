@@ -10,7 +10,7 @@
     "url": "https://github.com/zenato/puppeteer-renderer"
   },
   "homepage": "https://github.com/zenato/puppeteer-renderer/tree/master/middleware",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "An Express middleware for puppeteer-renderer",
   "main": "./dist/index.js",
   "license": "MIT",
@@ -19,7 +19,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "axios": "^0.16.2"
+    "axios": "^0.17.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
