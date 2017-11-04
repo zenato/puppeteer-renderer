@@ -9,6 +9,10 @@ before(async function () {
   renderer = await createRenderer();
 });
 
+after(async function () {
+  await renderer.close()
+})
+
 describe('Renderer', function () {
   this.timeout(10 * 1000);
 
@@ -17,3 +21,4 @@ describe('Renderer', function () {
     expect(html).to.be.a('string');
   });
 });
+

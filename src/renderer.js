@@ -51,6 +51,10 @@ class Renderer {
       }
     }
   }
+
+  async close() {
+    await this.browser.close()
+  }
 }
 
 async function create() {
