@@ -1,5 +1,7 @@
 FROM zenato/puppeteer
 
+USER root
+
 COPY . /app
 
 RUN cd /app && npm install
