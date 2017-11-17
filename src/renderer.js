@@ -9,7 +9,7 @@ class Renderer {
 
   async createPage(url) {
     const page = await this.browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.goto(url, { waitUntil: 'networkidle2' });
     return page;
   }
 
