@@ -26,11 +26,12 @@ class Renderer {
     }
   }
 
-  async pdf(url) {
+  async pdf(url, options) {
     let page = null;
     try {
       page = await this.createPage(url);
-      const buffer = await page.pdf({ format: 'A4' });
+      const defaultOptions = { format: 'A4' }
+      const buffer = await page.pdf(Object.assign(defaultOptions, options));
       return buffer;
     } finally {
       if (page) {
@@ -39,11 +40,12 @@ class Renderer {
     }
   }
 
-  async screenshot(url) {
+  async screenshot(url, options) {
     let page = null;
     try {
       page = await this.createPage(url);
-      const buffer = await page.screenshot({ fullPage: true });
+      const defaultOptions = { fullPage: true  }
+      const buffer = await page.screenshot(Object.assign(defaultOptions, options));
       return buffer;
     } finally {
       if (page) {

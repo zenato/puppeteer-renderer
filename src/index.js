@@ -14,7 +14,7 @@ app.disable('x-powered-by');
 
 // Render url.
 app.use(async (req, res, next) => {
-  let url = req.query.url;
+  let { url, type, ...options } = req.query;
 
   if (!url) {
     return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain');
@@ -25,14 +25,14 @@ app.use(async (req, res, next) => {
   }
 
   try {
-    switch (req.query.type) {
+    switch (type) {
       case 'pdf':
-        const pdf = await renderer.pdf(url);
+        const pdf = await renderer.pdf(url, options);
         res.set('Content-type', 'application/pdf').send(pdf);
         break;
 
       case 'screenshot':
-        const image = await renderer.screenshot(url);
+        const image = await renderer.screenshot(url, options);
         res.set('Content-type', 'image/png').send(image);
         break;
 
