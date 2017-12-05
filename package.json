@@ -7,7 +7,14 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "mocha"
+    "test": "mocha",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "src/**/*.js": [
+      "prettier --print-width 100 --single-quote --trailing-comma all --no-semi --write",
+      "git add"
+    ]
   },
   "license": "MIT",
   "dependencies": {
@@ -16,6 +23,9 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^4.0.1"
+    "husky": "^0.14.3",
+    "lint-staged": "^6.0.0",
+    "mocha": "^4.0.1",
+    "prettier": "^1.8.2"
   }
 }
