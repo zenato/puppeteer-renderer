@@ -9,7 +9,7 @@ class Renderer {
 
   async createPage(url, { timeout, waitUntil }) {
     let gotoOptions = {
-      timeout: Number(timeout) || 30,
+      timeout: Number(timeout) || 30 * 1000,
       waitUntil: waitUntil || 'networkidle2',
     }
 
