@@ -19,13 +19,13 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.16.2",
-    "puppeteer": "^0.13.0"
+    "puppeteer": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",
-    "mocha": "^4.0.1",
-    "prettier": "^1.9.2"
+    "mocha": "^4.1.0",
+    "prettier": "^1.10.2"
   }
 }
