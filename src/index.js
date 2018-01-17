@@ -64,3 +64,8 @@ createRenderer()
   .catch(e => {
     console.error('Fail to initialze renderer.', e)
   })
+
+// Terminate process
+process.on('SIGINT', () => {
+  process.exit(0)
+})
