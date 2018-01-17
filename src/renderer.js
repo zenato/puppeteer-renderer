@@ -7,16 +7,22 @@ class Renderer {
     this.browser = browser
   }
 
-  async createPage(url) {
+  async createPage(url, { timeout, waitUntil }) {
+    let gotoOptions = {
+      timeout: Number(timeout) || 30,
+      waitUntil: waitUntil || 'networkidle2',
+    }
+
     const page = await this.browser.newPage()
-    await page.goto(url, { waitUntil: 'networkidle2' })
+    await page.goto(url, gotoOptions)
     return page
   }
 
-  async render(url) {
+  async render(url, options) {
     let page = null
     try {
-      page = await this.createPage(url)
+      const { timeout, waitUntil } = options
+      page = await this.createPage(url, { timeout, waitUntil })
       const html = await page.content()
       return html
     } finally {
@@ -29,9 +35,17 @@ class Renderer {
   async pdf(url, options) {
     let page = null
     try {
-      page = await this.createPage(url)
-      const defaultOptions = { format: 'A4' }
-      const buffer = await page.pdf(Object.assign(defaultOptions, options))
+      const { timeout, waitUntil, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil })
+
+      const { scale, displayHeaderFooter, printBackground, landscape } = extraOptions
+      const buffer = await page.pdf({
+        ...extraOptions,
+        scale: Number(scale),
+        displayHeaderFooter: displayHeaderFooter === 'true',
+        printBackground: printBackground === 'true',
+        landscape: landscape === 'true',
+      })
       return buffer
     } finally {
       if (page) {
@@ -43,9 +57,16 @@ class Renderer {
   async screenshot(url, options) {
     let page = null
     try {
-      page = await this.createPage(url)
-      const defaultOptions = { fullPage: true }
-      const buffer = await page.screenshot(Object.assign(defaultOptions, options))
+      const { timeout, waitUntil, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil })
+
+      const { quality, fullPage, omitBackground } = extraOptions
+      const buffer = await page.screenshot({
+        ...extraOptions,
+        quality: Number(quality) || 100,
+        fullPage: fullPage === 'true',
+        omitBackground: omitBackground === 'true',
+      })
       return buffer
     } finally {
       if (page) {

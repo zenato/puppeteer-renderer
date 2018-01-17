@@ -53,8 +53,9 @@ app.listen(8080);
 
 ## API
 
-| Name  | Required | Value   | Description            |Usage                                                   |
-|-------|:--------:|:-------:|------------------------|--------------------------------------------------------|
-|url    |O         |         |Target URL              |http://puppeterr-renderer?url=http://www.google.com         |
-|type   |          |(pdf\|screenshot)    |Rendering another type. |http://puppeterr-renderer?url=http://www.google.com&type=pdf|
+| Name  | Required | Value           | Description            |Usage                                                   |
+|-------|:--------:|:---------------:|------------------------|--------------------------------------------------------|
+|url    |O         |                 |Target URL              |http://puppeterr-renderer?url=http://www.google.com         |
+|type   |          |(pdf\|screenshot)|Rendering another type. |http://puppeterr-renderer?url=http://www.google.com&type=pdf|
+|(Extra options)|  |                 |Extra options. (see puppeteer API doc)          |http://puppeterr-renderer?url=http://www.google.com&type=pdf&scale=2|
 
