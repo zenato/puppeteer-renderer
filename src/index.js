@@ -28,12 +28,22 @@ app.use(async (req, res, next) => {
     switch (type) {
       case 'pdf':
         const pdf = await renderer.pdf(url, options)
-        res.set('Content-type', 'application/pdf').send(pdf)
+        res
+          .set({
+            'Content-Type': 'application/pdf',
+            'Content-Length': pdf.length,
+          })
+          .send(pdf)
         break
 
       case 'screenshot':
         const image = await renderer.screenshot(url, options)
-        res.set('Content-type', 'image/png').send(image)
+        res
+          .set({
+            'Content-Type': 'image/png',
+            'Content-Length': image.length,
+          })
+          .send(image)
         break
 
       default:
