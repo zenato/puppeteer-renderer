@@ -1,6 +1,8 @@
 'use strict'
 
 const express = require('express')
+const { URL } = require('url')
+const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
 
 const port = process.env.PORT || 3000
@@ -27,11 +29,20 @@ app.use(async (req, res, next) => {
   try {
     switch (type) {
       case 'pdf':
+        const urlObj = new URL(url)
+        let filename = urlObj.hostname
+        if (urlObj.pathname !== '/') {
+          filename = urlObj.pathname.split('/').pop()
+          if (filename === '') filename = urlObj.pathname.replace(/\//g, '')
+          const extDotPosition = filename.lastIndexOf('.')
+          if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
+        }
         const pdf = await renderer.pdf(url, options)
         res
           .set({
             'Content-Type': 'application/pdf',
             'Content-Length': pdf.length,
+            'Content-Disposition': contentDisposition(filename + '.pdf'),
           })
           .send(pdf)
         break
