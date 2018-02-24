@@ -7,7 +7,7 @@ class Renderer {
     this.browser = browser
   }
 
-  async createPage(url, { timeout, waitUntil }) {
+  async createPage(url, { timeout, waitUntil, height, width, delay }) {
     let gotoOptions = {
       timeout: Number(timeout) || 30 * 1000,
       waitUntil: waitUntil || 'networkidle2',
@@ -15,6 +15,13 @@ class Renderer {
 
     const page = await this.browser.newPage()
     await page.goto(url, gotoOptions)
+	
+    if(Number(width)>0 && Number(height)>0){
+     await page.setViewport({width: Number(width), height: Number(height)});
+    }
+    if(Number(delay)>0){   
+    await page.waitFor(Number(delay))
+    } 
     return page
   }
 
@@ -35,8 +42,8 @@ class Renderer {
   async pdf(url, options) {
     let page = null
     try {
-      const { timeout, waitUntil, ...extraOptions } = options
-      page = await this.createPage(url, { timeout, waitUntil })
+      const { timeout, waitUntil,height, width, delay, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil, height, width, delay })
 
       const { scale, displayHeaderFooter, printBackground, landscape } = extraOptions
       const buffer = await page.pdf({
@@ -57,14 +64,13 @@ class Renderer {
   async screenshot(url, options) {
     let page = null
     try {
-      const { timeout, waitUntil, ...extraOptions } = options
-      page = await this.createPage(url, { timeout, waitUntil })
+      const { timeout, waitUntil,height, width, delay, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil, height, width, delay })
 
-      const { quality, fullPage, omitBackground } = extraOptions
+      const { fullPage, omitBackground } = extraOptions
       const buffer = await page.screenshot({
         ...extraOptions,
-        quality: Number(quality) || 100,
-        fullPage: fullPage === 'true',
+        fullPage: true,
         omitBackground: omitBackground === 'true',
       })
       return buffer
@@ -81,7 +87,7 @@ class Renderer {
 }
 
 async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] })
+  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] })
   return new Renderer(browser)
 }
 

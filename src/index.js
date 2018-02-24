@@ -6,6 +6,7 @@ const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
 
 const port = process.env.PORT || 3000
+const disable_url = process.env.DISABLE_URL || false
 
 const app = express()
 
@@ -16,16 +17,26 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, type, ...options } = req.query
+  let { url,uri,type, ...options } = req.query
 
-  if (!url) {
-    return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain')
+  if (!url && !uri) {
+    return res.status(400).send('Search with url or uri parameter. For eaxample, ?url=http://yourdomain, ?uri=/')
   }
 
-  if (!url.includes('://')) {
-    url = `http://${url}`
-  }
+//  if (!url.includes('://')) {
+//    url = `http://${url}`
+//  }
+  if(disable_url && disable_url.toLowerCase()=='true'){
+    if (!uri) {
+      return res.status(400).send('url disabled, please use uri')
+    }
+    url = req.protocol + '://' + req.get('host') + uri
+  } else if(!url){
+    url = req.protocol + '://' + req.get('host') + uri  
+  } 
 
+
+  console.log('Url:', url);
   try {
     switch (type) {
       case 'pdf':
