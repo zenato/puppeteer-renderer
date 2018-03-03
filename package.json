@@ -20,7 +20,8 @@
   "dependencies": {
     "content-disposition": "^0.5.2",
     "express": "^4.16.2",
-    "puppeteer": "^1.0.0"
+    "puppeteer": "^1.0.0",
+    "console-stamp": "^0.2.6"
   },
   "devDependencies": {
     "chai": "^4.1.2",
