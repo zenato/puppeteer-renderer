@@ -2,7 +2,7 @@
   "name": "puppeteer-renderer",
   "author": "yeongjinnn@gmail.com",
   "private": true,
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "husky": "^0.14.3",
-    "lint-staged": "^6.0.0",
+    "lint-staged": "^6.1.1",
     "mocha": "^4.1.0",
     "prettier": "^1.10.2"
   }
