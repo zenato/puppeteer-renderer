@@ -4,11 +4,15 @@ const puppeteer = require('puppeteer')
 
 class Renderer {
   constructor(browser) {
-    this.browser = browser
+    
   }
 
   async createPage(url, { timeout, waitUntil, height, width, delay }) {
-    let gotoOptions = {
+
+	this.browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] });
+   
+	  
+	let gotoOptions = {
       timeout: Number(timeout) || 30 * 1000,
       waitUntil: waitUntil || 'networkidle2',
     }
@@ -36,6 +40,9 @@ class Renderer {
       if (page) {
         await page.close()
       }
+      if (this.browser) {
+    	  await this.browser.close()
+      }
     }
   }
 
@@ -58,6 +65,9 @@ class Renderer {
       if (page) {
         await page.close()
       }
+      if (this.browser) {
+    	  await this.browser.close()
+      }
     }
   }
 
@@ -77,6 +87,9 @@ class Renderer {
     } finally {
       if (page) {
         await page.close()
+      }
+      if (this.browser) {
+    	  await this.browser.close()
       }
     }
   }

@@ -81,7 +81,7 @@ app.use(async (req, res, next) => {
 // Error page.
 app.use((err, req, res, next) => {
   console.error(err)
-  res.status(500).send('Oops, An expected error seems to have occurred.')
+  res.status(500).send('Oops, An unexpected error seems to have occurred: ' + err.message)
 })
 
 // Create renderer and start server.
