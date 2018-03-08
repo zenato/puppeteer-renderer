@@ -4,13 +4,18 @@ const puppeteer = require('puppeteer')
 
 class Renderer {
   constructor(browser) {
-    
+    this.defaultBrowser = browser
+    this.testUrl = 'https://google.com'
   }
 
   async createPage(url, { timeout, waitUntil, height, width, delay }) {
 
-	this.browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] });
-   
+	if(url==this.testUrl){
+		
+		this.browser =  this.defaultBrowser
+	} else {
+		this.browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] });
+	}
 	  
 	let gotoOptions = {
       timeout: Number(timeout) || 30 * 1000,
@@ -38,11 +43,13 @@ class Renderer {
       return html
     } finally {
       if (page) {
+    	console.log('Closing page...')
         await page.close()
       }
-      if (this.browser) {
-    	  await this.browser.close()
-      }
+      	if(url != this.testUrl){
+      		console.log('Closing browser...')
+      		await this.browser.close();
+      	}
     }
   }
 
@@ -63,11 +70,13 @@ class Renderer {
       return buffer
     } finally {
       if (page) {
+    	console.log('Closing page...')
         await page.close()
       }
-      if (this.browser) {
-    	  await this.browser.close()
-      }
+      if(url != this.testUrl){
+    		console.log('Closing browser...')
+    		await this.browser.close();
+    	}
     }
   }
 
@@ -83,14 +92,18 @@ class Renderer {
         fullPage: true,
         omitBackground: omitBackground === 'true',
       })
+      
       return buffer
     } finally {
       if (page) {
+    	console.log('Closing page...')
         await page.close()
       }
-      if (this.browser) {
-    	  await this.browser.close()
+      if(url != this.testUrl){
+    		console.log('Closing browser...')
+    		await this.browser.close();
       }
+      
     }
   }
 
