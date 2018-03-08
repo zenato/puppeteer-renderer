@@ -5,13 +5,17 @@ const puppeteer = require('puppeteer')
 class Renderer {
   constructor(browser) {
     this.defaultBrowser = browser
+   
     this.testUrl = 'https://google.com'
   }
 
   async createPage(url, { timeout, waitUntil, height, width, delay }) {
 
 	if(url==this.testUrl){
-		
+		 this.defaultBrowser.on('disconnected', async () => {
+		    	console.log('health check browser closed, re-creating...')
+		    	this.defaultBrowser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] })
+		    });
 		this.browser =  this.defaultBrowser
 	} else {
 		this.browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] });
