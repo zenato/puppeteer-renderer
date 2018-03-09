@@ -21,7 +21,8 @@
     "content-disposition": "^0.5.2",
     "express": "^4.16.2",
     "puppeteer": "^1.0.0",
-    "console-stamp": "^0.2.6"
+    "console-stamp": "^0.2.6",
+    "rimraf": "^2.6.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",

@@ -1,28 +1,15 @@
 'use strict'
 
 const puppeteer = require('puppeteer')
-
+const rimraf = require('rimraf');
 class Renderer {
   constructor(browser) {
-    this.defaultBrowser = browser
-   
-    this.testUrl = 'https://google.com'
+    this.browser = browser
   }
 
   async createPage(url, { timeout, waitUntil, height, width, delay }) {
-
-	if(url==this.testUrl){
-		 this.defaultBrowser.on('disconnected', async () => {
-		    	console.log('health check browser closed, re-creating...')
-		    	this.defaultBrowser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] })
-		    });
-		this.browser =  this.defaultBrowser
-	} else {
-		this.browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] });
-	}
-	  
-	let gotoOptions = {
-      timeout: Number(timeout) || 30 * 1000,
+    let gotoOptions = {
+      timeout: Number(timeout) || 20 * 1000,
       waitUntil: waitUntil || 'networkidle2',
     }
 
@@ -46,14 +33,14 @@ class Renderer {
       const html = await page.content()
       return html
     } finally {
-      if (page) {
-    	console.log('Closing page...')
-        await page.close()
-      }
-      	if(url != this.testUrl){
-      		console.log('Closing browser...')
-      		await this.browser.close();
-      	}
+        if (page) {
+        	await page.evaluate(() => {
+        		   localStorage.clear();
+        		 });
+        	console.log("Local Storage cleaned!");
+            await page.close()
+            console.log("Page closed!");
+          }
     }
   }
 
@@ -73,14 +60,15 @@ class Renderer {
       })
       return buffer
     } finally {
-      if (page) {
-    	console.log('Closing page...')
-        await page.close()
-      }
-      if(url != this.testUrl){
-    		console.log('Closing browser...')
-    		await this.browser.close();
-    	}
+        if (page) {
+        	await page.evaluate(() => {
+        		   localStorage.clear();
+        		  
+        		 });
+        	console.log("Local Storage cleaned!");
+            await page.close()
+            console.log("Page closed!");
+          }
     }
   }
 
@@ -96,18 +84,17 @@ class Renderer {
         fullPage: true,
         omitBackground: omitBackground === 'true',
       })
-      
       return buffer
     } finally {
+    	
       if (page) {
-    	console.log('Closing page...')
+    	await page.evaluate(() => {
+    		   localStorage.clear();
+    		 });
+    	console.log("Local Storage cleaned!");
         await page.close()
+        console.log("Page closed!");
       }
-      if(url != this.testUrl){
-    		console.log('Closing browser...')
-    		await this.browser.close();
-      }
-      
     }
   }
 
@@ -117,7 +104,7 @@ class Renderer {
 }
 
 async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage'] })
+  const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-dev-shm-usage']})
   return new Renderer(browser)
 }
 
