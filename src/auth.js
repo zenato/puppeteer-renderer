@@ -33,10 +33,10 @@ class Authentication {
       return
     }
     if (!token) {
-      res.status(401).send('No token provided: ' + err.message)
+      res.status(401).send('No token provided')
       return
     }
-    jwt.verify(token, secret, function(err, verifiedJwt) {
+    jwt.verify(token, secret, function(err) {
       if (err) {
         console.log(err)
         res.status(401).send('Failed to authenticate token: ' + err.message)
