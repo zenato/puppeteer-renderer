@@ -3,7 +3,8 @@
 const jwt = require('jsonwebtoken')
 const AWS = require('aws-sdk')
 const signingSecret = process.env.SIGNING_SECRET || ''
-const name = process.env.NAMES || 'data-platform-pod0-dev.centrify.io.jwt-secret-signing'
+const ssmNamespace = process.env.SSM_NAMESPACE || 'data-platform-pod0-dev.centrify.io'
+const ssmKey = process.env.SSM_KEY || 'jwt-secret-signing'
 
 let secret = null
 class Authentication {
@@ -16,7 +17,7 @@ class Authentication {
       })
       var ssm = new AWS.SSM()
       var params = {
-        Names: [name],
+        Names: [ssmNamespace + '.' + ssmKey],
         WithDecryption: true,
       }
       ssm.getParameters(params, function(err, data) {
