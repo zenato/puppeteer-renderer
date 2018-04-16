@@ -12,9 +12,6 @@ class Authentication {
     if (signingSecret) {
       secret = signingSecret
     } else {
-      AWS.config.update({
-        region: 'us-west-2',
-      })
       var ssm = new AWS.SSM()
       var params = {
         Names: [ssmNamespace + '.' + ssmKey],
