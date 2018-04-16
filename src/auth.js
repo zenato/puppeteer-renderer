@@ -3,7 +3,7 @@
 const jwt = require('jsonwebtoken')
 const AWS = require('aws-sdk')
 const signingSecret = process.env.SIGNING_SECRET || ''
-const ssmNamespace = process.env.SSM_NAMESPACE || 'data-platform-pod0-dev.centrify.io'
+const ssmNamespace = process.env.SSM_NAMESPACE || ''
 const ssmKey = process.env.SSM_KEY || 'jwt-secret-signing'
 
 let secret = null
@@ -24,21 +24,25 @@ class Authentication {
         if (err) {
           console.log(err)
         } else {
-          secret = data['Parameters'][0]['Value']
+          if (data['Parameters'][0]) secret = data['Parameters'][0]['Value']
         }
       })
     }
   }
 
   authToken(token, res) {
-    if (!token) res.status(401).send('No token provided.' + err.message)
     if (!secret) {
-      res.status(401).send('Failed to authenticate token.' + err.message)
+      res.status(500).send('Token authencaiton need valid secret')
+      return
+    }
+    if (!token) {
+      res.status(401).send('No token provided: ' + err.message)
+      return
     }
     jwt.verify(token, secret, function(err, verifiedJwt) {
       if (err) {
         console.log(err)
-        res.status(401).send('Failed to authenticate token.' + err.message)
+        res.status(401).send('Failed to authenticate token: ' + err.message)
       }
     })
   }
