@@ -21,7 +21,7 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, ...options } = req.query
+  let { url, uri, type, token, ...options } = req.query
 
   if (!url && !uri) {
     return res
