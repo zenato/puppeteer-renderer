@@ -39,4 +39,4 @@ EXPOSE 3000
 WORKDIR /app
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD npm run start
+CMD ./start-server.sh

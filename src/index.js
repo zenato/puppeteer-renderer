@@ -9,6 +9,8 @@ const Auth = require('./auth')
 
 const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
+const disable_auth = process.env.DISABLE_AUTH || false
+const healthcheck_url = process.env.HEALTHCHECK_URL || false
 let authentication = new Auth()
 authentication.syncSecret()
 
@@ -22,6 +24,21 @@ app.disable('x-powered-by')
 // Render url.
 app.use(async (req, res, next) => {
   let { url, uri, type, token, ...options } = req.query
+  if(req.url == '/healthcheck'){
+	  try {
+		  if(!healthcheck_url) {
+			  url = "https://www.google.com"
+		  } else {
+			  url = healthcheck_url
+		  }
+		  console.info('Health check called, visiting url: ' + url)
+		  const html = await renderer.render(url, options)
+		  return res.status(200).send(html)
+	  } catch (e) {
+		  next(e)
+	  }
+  }
+
   if (!url && !uri) {
     return res
       .status(400)
@@ -49,8 +66,9 @@ app.use(async (req, res, next) => {
     }
   }
 
-  authentication.authToken(token, res)
-
+  if (!disable_auth || disable_auth.toLowerCase() !== 'true') {
+	  authentication.authToken(token, res)
+  }
   try {
     switch (type) {
       case 'pdf':
@@ -96,6 +114,7 @@ app.use((err, req, res, next) => {
   console.error(err)
   res.status(500).send('Oops, An unexpected error seems to have occurred: ' + err.message)
 })
+
 
 // Create renderer and start server.
 createRenderer()
