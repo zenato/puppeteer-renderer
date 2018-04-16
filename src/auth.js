@@ -10,7 +10,6 @@ class Authentication {
   syncSecret() {
     if (signingSecret) {
       secret = signingSecret
-      console.log('local secret key:', secret)
     } else {
       AWS.config.update({
         region: 'us-west-2',
@@ -22,31 +21,23 @@ class Authentication {
       }
       ssm.getParameters(params, function(err, data) {
         if (err) {
-          console.log(err, err.stack)
+          console.log(err)
         } else {
           secret = data['Parameters'][0]['Value']
-          console.log('ssm secret key:', secret)
         }
       })
     }
   }
 
   authToken(token, res) {
-    if (!token)
-      return res.status(401).send({
-        auth: false,
-        message: 'No token provided.',
-      })
-    console.log('jwt authentication secret:', secret)
+    if (!token) res.status(401).send('No token provided.' + err.message)
+    if (!secret) {
+      res.status(401).send('Failed to authenticate token.' + err.message)
+    }
     jwt.verify(token, secret, function(err, verifiedJwt) {
       if (err) {
         console.log(err)
-        return res.status(401).send({
-          auth: false,
-          message: 'Failed to authenticate token.',
-        })
-      } else {
-        console.log(verifiedJwt)
+        res.status(401).send('Failed to authenticate token.' + err.message)
       }
     })
   }

@@ -9,7 +9,6 @@ const Auth = require('./auth')
 
 const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
-
 let authentication = new Auth()
 authentication.syncSecret()
 
@@ -22,7 +21,7 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, token, ...options } = req.query
+  let { url, uri, type, ...options } = req.query
 
   if (!url && !uri) {
     return res
@@ -45,9 +44,10 @@ app.use(async (req, res, next) => {
   console.log('Url:', url)
 
   if (!token) {
-    token = req.headers['x-access-token']
+    var str = req.headers['authorization']
+    tokenIndex = str.lastIndexOf(' ')
+    token = str.substring(tokenIndex + 1)
   }
-  console.log(token)
   authentication.authToken(token, res)
 
   try {
