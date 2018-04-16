@@ -1,13 +1,16 @@
 'use strict'
 
-require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' });
+require('console-stamp')(console, { pattern: 'dd/mm/yyyy HH:MM:ss.l' })
 const express = require('express')
 const { URL } = require('url')
 const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
+const Auth = require('./auth')
 
 const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
+let authentication = new Auth()
+authentication.syncSecret()
 
 const app = express()
 
@@ -18,26 +21,36 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url,uri,type, ...options } = req.query
-
+  let { url, uri, type, token, ...options } = req.query
   if (!url && !uri) {
-    return res.status(400).send('Search with url or uri parameter. For eaxample, ?url=http://yourdomain, ?uri=/')
+    return res
+      .status(400)
+      .send('Search with url or uri parameter. For eaxample, ?url=http://yourdomain, ?uri=/')
   }
 
-//  if (!url.includes('://')) {
-//    url = `http://${url}`
-//  }
-  if(disable_url && disable_url.toLowerCase()=='true'){
+  //  if (!url.includes('://')) {
+  //    url = `http://${url}`
+  //  }
+  if (disable_url && disable_url.toLowerCase() == 'true') {
     if (!uri) {
       return res.status(400).send('url disabled, please use uri')
     }
     url = req.protocol + '://' + req.get('host') + uri
-  } else if(!url){
-    url = req.protocol + '://' + req.get('host') + uri  
-  } 
+  } else if (!url) {
+    url = req.protocol + '://' + req.get('host') + uri
+  }
 
+  console.log('Url:', url)
 
-  console.log('Url:', url);
+  if (!token) {
+    var str = req.headers['authorization']
+    if (str) {
+      token = str.trim().split(' ')[1]
+    }
+  }
+
+  authentication.authToken(token, res)
+
   try {
     switch (type) {
       case 'pdf':

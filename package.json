@@ -18,10 +18,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.224.1",
+    "console-stamp": "^0.2.6",
     "content-disposition": "^0.5.2",
     "express": "^4.16.2",
+    "jsonwebtoken": "^8.2.1",
     "puppeteer": "^1.0.0",
-    "console-stamp": "^0.2.6",
     "rimraf": "^2.6.2"
   },
   "devDependencies": {
