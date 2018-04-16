@@ -22,7 +22,6 @@ app.disable('x-powered-by')
 // Render url.
 app.use(async (req, res, next) => {
   let { url, uri, type, token, ...options } = req.query
-
   if (!url && !uri) {
     return res
       .status(400)
@@ -45,9 +44,11 @@ app.use(async (req, res, next) => {
 
   if (!token) {
     var str = req.headers['authorization']
-    tokenIndex = str.lastIndexOf(' ')
-    token = str.substring(tokenIndex + 1)
+    if (str) {
+      token = str.trim().split(' ')[1]
+    }
   }
+
   authentication.authToken(token, res)
 
   try {
