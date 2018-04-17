@@ -24,19 +24,19 @@ app.disable('x-powered-by')
 // Render url.
 app.use(async (req, res, next) => {
   let { url, uri, type, token, ...options } = req.query
-  if(req.url == '/healthcheck'){
-	  try {
-		  if(!healthcheck_url) {
-			  url = "https://www.google.com"
-		  } else {
-			  url = healthcheck_url
-		  }
-		  console.info('Health check called, visiting url: ' + url)
-		  const html = await renderer.render(url, options)
-		  return res.status(200).send(html)
-	  } catch (e) {
-		  next(e)
-	  }
+  if (req.url == '/healthcheck') {
+    try {
+      if (!healthcheck_url) {
+        url = 'https://www.google.com'
+      } else {
+        url = healthcheck_url
+      }
+      console.info('Health check called, visiting url: ' + url)
+      const html = await renderer.render(url, options)
+      return res.status(200).send(html)
+    } catch (e) {
+      next(e)
+    }
   }
 
   if (!url && !uri) {
@@ -62,12 +62,13 @@ app.use(async (req, res, next) => {
   if (!token) {
     var str = req.headers['authorization']
     if (str) {
-      token = str.trim().split(' ')[1]
+      var arr = str.trim().split(' ')
+      token = arr[arr.length - 1]
     }
   }
 
   if (!disable_auth || disable_auth.toLowerCase() !== 'true') {
-	  authentication.authToken(token, res)
+    authentication.authToken(token, res)
   }
   try {
     switch (type) {
@@ -114,7 +115,6 @@ app.use((err, req, res, next) => {
   console.error(err)
   res.status(500).send('Oops, An unexpected error seems to have occurred: ' + err.message)
 })
-
 
 // Create renderer and start server.
 createRenderer()
