@@ -12,6 +12,7 @@ const disable_url = process.env.DISABLE_URL || false
 const disable_auth = process.env.DISABLE_AUTH || false
 const healthcheck_url = process.env.HEALTHCHECK_URL || false
 const protocol_env = process.env.PROTOCOL || false
+const base_host = process.env.SSM_NAMESPACE || false
 
 let authentication = new Auth()
 authentication.syncSecret()
@@ -61,7 +62,13 @@ app.use(async (req, res, next) => {
     if (!uri.startsWith("/analytics/ui/#/explore") && !uri.startsWith("/analytics/ui/#/dashboards") && !uri.startsWith("/analytics/ui/#/widgets")){
       return res.status(400).send('uri: '+ uri + ' is not allowed, use explore/dashboards')
     }
-    url = url_protocol + '://' + req.get('host') + uri
+    
+    if(!base_host) {
+    	url = url_protocol + '://' + req.get('host') + uri
+    } else {
+    	url = url_protocol + '://' + base_host + '/' + uri
+    }
+    	
     
     
     if(token){
