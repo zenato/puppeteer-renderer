@@ -11,6 +11,8 @@ const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
 const disable_auth = process.env.DISABLE_AUTH || false
 const healthcheck_url = process.env.HEALTHCHECK_URL || false
+const protocol_env = process.env.PROTOCOL || false
+
 let authentication = new Auth()
 authentication.syncSecret()
 
@@ -48,13 +50,29 @@ app.use(async (req, res, next) => {
   //  if (!url.includes('://')) {
   //    url = `http://${url}`
   //  }
+  let url_protocol = req.protocol
+  if(protocol_env){
+	  url_protocol = protocol_env
+  }
   if (disable_url && disable_url.toLowerCase() == 'true') {
     if (!uri) {
       return res.status(400).send('url disabled, please use uri')
     }
-    url = req.protocol + '://' + req.get('host') + uri
+    if (!uri.startsWith("/analytics/ui/#/explore") && !uri.startsWith("/analytics/ui/#/dashboards") && !uri.startsWith("/analytics/ui/#/widgets")){
+      return res.status(400).send('uri: '+ uri + ' is not allowed, use explore/dashboards')
+    }
+    url = url_protocol + '://' + req.get('host') + uri
+    
+    
+    if(token){
+    	if(url.indexOf('?') > -1) {
+    	 url = url + "&token="+token
+    	} else {
+    	 url = url + "?token="+token	
+    	}
+    }
   } else if (!url) {
-    url = req.protocol + '://' + req.get('host') + uri
+    url = url_protocol + '://' + req.get('host') + uri
   }
 
   console.log('Url:', url)
