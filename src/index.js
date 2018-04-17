@@ -60,7 +60,7 @@ app.use(async (req, res, next) => {
   console.log('Url:', url)
 
   if (!token) {
-    var str = req.headers['authorization']
+    var str = req.get('authorization')
     if (str) {
       var arr = str.trim().split(' ')
       token = arr[arr.length - 1]
