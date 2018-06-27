@@ -6,6 +6,8 @@ const { URL } = require('url')
 const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
 const Auth = require('./auth')
+const NodeCache = require("node-cache");
+const myCache=new NodeCache({stdTTL:100, checkperiod:120});
 
 const port = process.env.PORT || 3000
 const disable_url = process.env.DISABLE_URL || false
@@ -106,7 +108,15 @@ app.use(async (req, res, next) => {
           const extDotPosition = filename.lastIndexOf('.')
           if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
         }
-        const pdf = await renderer.pdf(url, options)
+        let pdf_path=url+'pdf';
+        let value_pdf=myCache.get(pdf_path);
+        let pdf=null;
+        if(value_pdf==undefined){
+          pdf = await renderer.pdf(url, options)
+          myCache.set(pdf_path,pdf,10000);
+        }else{
+          pdf=value_pdf;
+        }     
         res
           .set({
             'Content-Type': 'application/pdf',
@@ -117,7 +127,15 @@ app.use(async (req, res, next) => {
         break
 
       case 'screenshot':
-        const image = await renderer.screenshot(url, options)
+        let image_path=url+'image';
+        let value_image=myCache.get(image_path);
+        let image=null;
+        if(value_image==undefined){
+          image = await renderer.screenshot(url, options)
+          myCache.set(image_path,image,10000);
+        }else{
+          image=value_image;
+        }
         res
           .set({
             'Content-Type': 'image/png',
