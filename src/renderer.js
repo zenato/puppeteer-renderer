@@ -7,18 +7,17 @@ class Renderer {
     this.browser = browser
   }
 
-  async createPage(url, { timeout, waitUntil }) {
-    let gotoOptions = {
+  async createPage(url, options = {}) {
+    const { timeout, waitUntil } = options
+    const page = await this.browser.newPage()
+    await page.goto(url, {
       timeout: Number(timeout) || 30 * 1000,
       waitUntil: waitUntil || 'networkidle2',
-    }
-
-    const page = await this.browser.newPage()
-    await page.goto(url, gotoOptions)
+    })
     return page
   }
 
-  async render(url, options) {
+  async render(url, options = {}) {
     let page = null
     try {
       const { timeout, waitUntil } = options
@@ -32,7 +31,7 @@ class Renderer {
     }
   }
 
-  async pdf(url, options) {
+  async pdf(url, options = {}) {
     let page = null
     try {
       const { timeout, waitUntil, ...extraOptions } = options
@@ -54,7 +53,7 @@ class Renderer {
     }
   }
 
-  async screenshot(url, options) {
+  async screenshot(url, options = {}) {
     let page = null
     try {
       const { timeout, waitUntil, ...extraOptions } = options
