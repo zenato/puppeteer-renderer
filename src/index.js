@@ -137,10 +137,8 @@ app.use(async (req, res, next) => {
         let image=null;
         // get latest page
         if(flag==0){
-          console.log("flag: 0")
           image = await renderer.screenshot(url, options)                
         }else{  // get page from cache
-          console.log("flag: 1")
           let image_path=url+'_image';
           let imageCache=myCache.get(image_path);       
           if(imageCache==undefined){
