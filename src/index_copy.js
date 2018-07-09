@@ -28,7 +28,14 @@ app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
-  let { url, uri, type, flag, token, ...options } = req.query
+  let { url, uri, type, token, ...options } = req.query
+  let completeUrl=null;
+  completeUrl=url+uri;
+  console.log("url :"+url);
+  console.log("uri :"+uri);
+  console.log("token :"+token);
+  console.log("type :"+type);
+
   if (req.url == '/healthcheck') {
     try {
       if (!healthcheck_url) {
@@ -53,6 +60,7 @@ app.use(async (req, res, next) => {
   //    url = `http://${url}`
   //  }
   let url_protocol = req.protocol
+  console.log("url_protocol :"+url_protocol);
   if(protocol_env){
 	  url_protocol = protocol_env
   }
@@ -95,7 +103,7 @@ app.use(async (req, res, next) => {
   if (!disable_auth || disable_auth.toLowerCase() !== 'true') {
     authentication.authToken(token, res)
   }
-
+  console.log("1");
   try {
     switch (type) {
       case 'pdf':
@@ -107,20 +115,15 @@ app.use(async (req, res, next) => {
           const extDotPosition = filename.lastIndexOf('.')
           if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
         }
-        //updated page
+        let pdf_path=url+'pdf';
+        let value_pdf=myCache.get(pdf_path);
         let pdf=null;
-        if(flag==0){
+        if(value_pdf==undefined){
           pdf = await renderer.pdf(url, options)
+          myCache.set(pdf_path,pdf,10000);
         }else{
-          let pdf_path=url+'_pdf';
-          let pdfCache=myCache.get(pdf_path);
-          if(pdfCache==undefined){
-            pdf = await renderer.pdf(url, options)
-            myCache.set(pdf_path,pdf,10000);
-          }else{
-            pdf=pdfCache;
-          }     
-        }
+          pdf=value_pdf;
+        }     
         res
           .set({
             'Content-Type': 'application/pdf',
@@ -128,32 +131,25 @@ app.use(async (req, res, next) => {
             'Content-Disposition': contentDisposition(filename + '.pdf'),
           })
           .send(pdf)
-        
         break
 
       case 'screenshot':
-        // updated page
+        console.log("screenshot url:"+completeUrl);
+        let image_path=completeUrl+'image';
+        let value_image=myCache.get(image_path);
         let image=null;
-        if(flag==0){
-          console.log("flag: 0")
-          image = await renderer.screenshot(url, options)                
-        }else{  // previous page
-          console.log("flag: 1")
-          let image_path=url+'_image';
-          let imageCache=myCache.get(image_path);       
-          if(imageCache==undefined){
-            image = await renderer.screenshot(url, options)
-            myCache.set(image_path,image,10000);
-          }else{
-            image=imageCache;
-          }      
+        if(value_image==undefined){
+          image = await renderer.screenshot(completeUrl, options)
+          myCache.set(image_path,image,10000);
+        }else{
+          image=value_image;
         }
         res
           .set({
             'Content-Type': 'image/png',
             'Content-Length': image.length,
           })
-          .send(image)      
+          .send(image)
         break
 
       default:
@@ -163,7 +159,7 @@ app.use(async (req, res, next) => {
   } catch (e) {
     console.log("3");
     next(e)
-
+    console.log("4");
   }
 })
 
