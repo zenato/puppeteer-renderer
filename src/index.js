@@ -107,11 +107,12 @@ app.use(async (req, res, next) => {
           const extDotPosition = filename.lastIndexOf('.')
           if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
         }
-        //updated page
+        
         let pdf=null;
+        //get latest page
         if(flag==0){
           pdf = await renderer.pdf(url, options)
-        }else{
+        }else{//get page from cache
           let pdf_path=url+'_pdf';
           let pdfCache=myCache.get(pdf_path);
           if(pdfCache==undefined){
@@ -132,12 +133,13 @@ app.use(async (req, res, next) => {
         break
 
       case 'screenshot':
-        // updated page
+        
         let image=null;
+        // get latest page
         if(flag==0){
           console.log("flag: 0")
           image = await renderer.screenshot(url, options)                
-        }else{  // previous page
+        }else{  // get page from cache
           console.log("flag: 1")
           let image_path=url+'_image';
           let imageCache=myCache.get(image_path);       
