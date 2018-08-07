@@ -59,6 +59,11 @@ class Renderer {
       const { timeout, waitUntil, ...extraOptions } = options
       page = await this.createPage(url, { timeout, waitUntil })
 
+      page.setViewport({
+        width: Number(extraOptions.width || 800),
+        height: Number(extraOptions.height || 600),
+      })
+
       const { fullPage, omitBackground, imageType, quality } = extraOptions
 
       const buffer = await page.screenshot({
