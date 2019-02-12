@@ -65,7 +65,7 @@ Render based on a URL.
 |(Extra options)|    |                     |Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&scale=2`|
 
 ### `[POST] /`
-Render based on a HTML string.
+Render based on an HTML string.
 
 #### Query string parameters:
 
