@@ -6,6 +6,8 @@
 
 Useful server side rendering through proxy. Outputs HTML, PDF and screenshots as PNG.
 
+_Updated with HTML string-based rendering, in addition to the already provided URL-based rendering._
+
 ## Requirements
 You can run Chromium or docker.
 
@@ -51,11 +53,33 @@ app.listen(8080);
 
 ## API
 
+### `[GET] /`
+Render based on a URL.
+
+#### Query string parameters:
+
 | Name    | Required | Value               | Description            |Usage                                                         |
 |---------|:--------:|:-------------------:|------------------------|--------------------------------------------------------------|
 |`url`    | yes      |                     |Target URL              |`http://puppeteer-renderer?url=http://www.google.com`         |
 |`type`   |          |`pdf` or `screenshot`|Rendering another type. |`http://puppeteer-renderer?url=http://www.google.com&type=pdf`|
 |(Extra options)|    |                     |Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&scale=2`|
+
+### `[POST] /`
+Render based on a HTML string.
+
+#### Query string parameters:
+
+| Name    | Required | Value               | Description            |Usage                                                         |
+|---------|:--------:|:-------------------:|------------------------|--------------------------------------------------------------|
+|`type`   |          |`pdf` or `screenshot`|Rendering another type. |`http://puppeteer-renderer?url=http://www.google.com&type=pdf`|
+|(Extra options)|    |                     |Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&scale=2`|
+
+#### Form fields:
+
+| Name     | Required | Value               | Description                |Usage                                                         |
+|----------|:--------:|:-------------------:|----------------------------|--------------------------------------------------------------|
+|`html`    | yes      |                     |HTML string.                |                                                              |
+|`filename`| yes      |                     |Filename without extension  |                                                              |
 
 ## PDF File Name Convention
 
