@@ -18,6 +18,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "content-disposition": "^0.5.2",
     "express": "^4.16.3",
     "puppeteer": "^1.8.0"

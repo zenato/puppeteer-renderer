@@ -14,8 +14,12 @@ let renderer = null
 // Configure.
 app.disable('x-powered-by')
 
+var bodyParser = require('body-parser')
+app.use(bodyParser.json()) // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })) // support encoded bodies
+
 // Render url.
-app.use(async (req, res, next) => {
+app.get('/', async (req, res) => {
   let { url, type, ...options } = req.query
 
   if (!url) {
@@ -60,6 +64,50 @@ app.use(async (req, res, next) => {
       default:
         const html = await renderer.render(url, options)
         res.status(200).send(html)
+    }
+  } catch (e) {
+    next(e)
+  }
+})
+
+// Render HTML.
+// POST form data: [html]=HTML data, [filename]=filename without extension (only for type='pdf')
+app.post('/', async (req, res) => {
+  let { type, ...options } = req.query
+  const html = req.body.html
+  const filename = req.body.filename
+
+  if (!html) {
+    return res.status(400).send('Missing form field "html".')
+  }
+
+  if (!filename) {
+    return res.status(400).send('Missing form field "filename".')
+  }
+
+  try {
+    switch (type) {
+      default:
+      case 'pdf':
+        const pdf = await renderer.pdfFromHtml(html, options)
+        res
+          .set({
+            'Content-Type': 'application/pdf',
+            'Content-Length': pdf.length,
+            'Content-Disposition': contentDisposition(filename + '.pdf'),
+          })
+          .send(pdf)
+        break
+
+      case 'screenshot':
+        const image = await renderer.screenshot(url, options)
+        res
+          .set({
+            'Content-Type': 'image/png',
+            'Content-Length': image.length,
+          })
+          .send(image)
+        break
     }
   } catch (e) {
     next(e)

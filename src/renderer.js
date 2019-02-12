@@ -17,6 +17,12 @@ class Renderer {
     return page
   }
 
+  async createPageFromHtml(html) {
+    const page = await this.browser.newPage()
+    await page.setContent(html)
+    return page
+  }
+
   async render(url, options = {}) {
     let page = null
     try {
@@ -36,21 +42,36 @@ class Renderer {
     try {
       const { timeout, waitUntil, ...extraOptions } = options
       page = await this.createPage(url, { timeout, waitUntil })
-
-      const { scale, displayHeaderFooter, printBackground, landscape } = extraOptions
-      const buffer = await page.pdf({
-        ...extraOptions,
-        scale: Number(scale),
-        displayHeaderFooter: displayHeaderFooter === 'true',
-        printBackground: printBackground === 'true',
-        landscape: landscape === 'true',
-      })
-      return buffer
+      return await this.pageBuffer(page, extraOptions)
     } finally {
       if (page) {
         await page.close()
       }
     }
+  }
+
+  async pdfFromHtml(html, options = {}) {
+    let page = null
+    try {
+      page = await this.createPageFromHtml(html)
+      return await this.pageBuffer(page, options)
+    } finally {
+      if (page) {
+        await page.close()
+      }
+    }
+  }
+
+  async pageBuffer(page, options) {
+    const { scale, displayHeaderFooter, printBackground, landscape } = options
+
+    return await page.pdf({
+      ...options,
+      scale: Number(scale),
+      displayHeaderFooter: displayHeaderFooter === 'true',
+      printBackground: printBackground === 'true',
+      landscape: landscape === 'true',
+    })
   }
 
   async screenshot(url, options = {}) {
