@@ -73,3 +73,9 @@ The file name is generated from the URL rendered:
 | `https://www.example.com/path/to/resource`    | `resource.pdf`               |
 | `https://www.example.com/path/to/resource.ext`| `resource.pdf`               |
 
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2017-present, Yeongjin Lee
