@@ -10,7 +10,7 @@
     "url": "https://github.com/zenato/puppeteer-renderer"
   },
   "homepage": "https://github.com/zenato/puppeteer-renderer/tree/master/middleware",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "An Express middleware for puppeteer-renderer",
   "main": "./dist/index.js",
   "license": "MIT",
@@ -34,6 +34,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",
+    "lodash": ">=4.17.11",
     "prettier": "^1.9.2"
   },
   "keywords": [
