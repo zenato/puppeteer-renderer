@@ -37,7 +37,7 @@ class Renderer {
       const { timeout, waitUntil, ...extraOptions } = options
       page = await this.createPage(url, { timeout, waitUntil })
 
-      const { scale, displayHeaderFooter, printBackground, landscape } = extraOptions
+      const { scale = 1.0, displayHeaderFooter, printBackground, landscape } = extraOptions
       const buffer = await page.pdf({
         ...extraOptions,
         scale: Number(scale),
