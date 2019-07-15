@@ -61,8 +61,6 @@ const staticFileExtensions = [
   'zip',
 ]
 
-let isRender = false
-
 module.exports = function(options) {
   if (!options || !options.url) {
     throw new Error('Must set url.')
@@ -76,9 +74,6 @@ module.exports = function(options) {
   const timeout = options.timeout || 10 * 1000
 
   return (req, res, next) => {
-    if (isRender) return next()
-    isRender = true
-
     if (!userAgentPattern.test(req.headers['user-agent']) || excludeUrlPattern.test(req.path)) {
       return next()
     }
