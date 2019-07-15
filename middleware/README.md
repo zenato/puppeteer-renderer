@@ -1,6 +1,6 @@
 # puppeteer-renderer-middleware
 
-An Express middleware for [puppeteer-renderer](http://github.com/zenato/puppeteer-renderer).
+An Express middleware for SSR using [puppeteer-renderer](http://github.com/zenato/puppeteer-renderer).
 
 
 ## Usage
