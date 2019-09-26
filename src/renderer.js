@@ -8,8 +8,13 @@ class Renderer {
   }
 
   async createPage(url, options = {}) {
-    const { timeout, waitUntil } = options
+    const { timeout, waitUntil, credentials } = options
     const page = await this.browser.newPage()
+
+    if (credentials) {
+      page.authenticate(credentials)
+    }
+
     await page.goto(url, {
       timeout: Number(timeout) || 30 * 1000,
       waitUntil: waitUntil || 'networkidle2',
@@ -20,8 +25,8 @@ class Renderer {
   async render(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil } = options
-      page = await this.createPage(url, { timeout, waitUntil })
+      const { timeout, waitUntil, credentials } = options
+      page = await this.createPage(url, { timeout, waitUntil, credentials })
       const html = await page.content()
       return html
     } finally {
@@ -34,8 +39,8 @@ class Renderer {
   async pdf(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, ...extraOptions } = options
-      page = await this.createPage(url, { timeout, waitUntil })
+      const { timeout, waitUntil, credentials, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil, credentials })
 
       const { scale = 1.0, displayHeaderFooter, printBackground, landscape } = extraOptions
       const buffer = await page.pdf({
@@ -56,8 +61,8 @@ class Renderer {
   async screenshot(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, ...extraOptions } = options
-      page = await this.createPage(url, { timeout, waitUntil })
+      const { timeout, waitUntil, credentials, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil, credentials })
       page.setViewport({
         width: Number(extraOptions.width || 800),
         height: Number(extraOptions.height || 600),
