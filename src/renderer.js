@@ -63,15 +63,19 @@ class Renderer {
         height: Number(extraOptions.height || 600),
       })
 
-      const { fullPage, omitBackground, imageType, quality } = extraOptions
+      const { fullPage, omitBackground, screenshotType, quality, ...restOptions } = extraOptions
       const buffer = await page.screenshot({
-        ...extraOptions,
-        type: imageType || 'png',
-        quality: Number(quality) || (imageType === undefined || imageType == 'png' ? 0 : 100),
+        ...restOptions,
+        type: screenshotType || 'png',
+        quality:
+          Number(quality) || (screenshotType === undefined || screenshotType === 'png' ? 0 : 100),
         fullPage: fullPage === 'true',
         omitBackground: omitBackground === 'true',
       })
-      return buffer
+      return {
+        screenshotType,
+        buffer,
+      }
     } finally {
       if (page) {
         await page.close()

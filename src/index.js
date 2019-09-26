@@ -48,13 +48,13 @@ app.use(async (req, res, next) => {
         break
 
       case 'screenshot':
-        const image = await renderer.screenshot(url, options)
+        const { screenshotType, buffer } = await renderer.screenshot(url, options)
         res
           .set({
-            'Content-Type': 'image/png',
-            'Content-Length': image.length,
+            'Content-Type': `image/${screenshotType}`,
+            'Content-Length': buffer.length,
           })
-          .send(image)
+          .send(buffer)
         break
 
       default:
