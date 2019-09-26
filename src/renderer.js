@@ -84,8 +84,10 @@ class Renderer {
   }
 }
 
-async function create() {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] })
+async function create(options = {}) {
+  const browser = await puppeteer.launch(
+    Object.assign({args: ['--no-sandbox']}, options)
+  )
   return new Renderer(browser)
 }
 
