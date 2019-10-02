@@ -12,7 +12,7 @@ class Renderer {
     const page = await this.browser.newPage()
 
     if (credentials) {
-      page.authenticate(credentials)
+      await page.authenticate(credentials)
     }
 
     await page.goto(url, {
