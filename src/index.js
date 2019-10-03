@@ -73,7 +73,9 @@ app.use((err, req, res, next) => {
 })
 
 // Create renderer and start server.
-createRenderer()
+createRenderer({
+  ignoreHTTPSErrors: !!process.env.IGNORE_HTTPS_ERRORS
+})
   .then(createdRenderer => {
     renderer = createdRenderer
     console.info('Initialized renderer.')
