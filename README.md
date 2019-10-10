@@ -54,7 +54,7 @@ app.listen(8080);
 | Name    | Required | Value               | Description            |Usage                                                         |
 |---------|:--------:|:-------------------:|------------------------|--------------------------------------------------------------|
 |`url`    | yes      |                     |Target URL              |`http://puppeteer-renderer?url=http://www.google.com`         |
-|`type`   |          |`pdf` or `screenshot`|Rendering another type. |`http://puppeteer-renderer?url=http://www.google.com&type=pdf`|
+|`type`   |          |`pdf` or `screenshot`|Rendering another type. |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&margin.top=10px`|
 |(Extra options)|    |                     |Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&scale=2`|
 
 ## PDF File Name Convention

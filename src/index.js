@@ -1,6 +1,7 @@
 'use strict'
 
 const express = require('express')
+const qs = require('qs')
 const { URL } = require('url')
 const contentDisposition = require('content-disposition')
 const createRenderer = require('./renderer')
@@ -12,10 +13,12 @@ const app = express()
 let renderer = null
 
 // Configure.
+app.set('query parser', s => qs.parse(s, { allowDots: true }))
 app.disable('x-powered-by')
 
 // Render url.
 app.use(async (req, res, next) => {
+  console.log(req.query)
   let { url, type, ...options } = req.query
 
   if (!url) {
@@ -74,7 +77,7 @@ app.use((err, req, res, next) => {
 
 // Create renderer and start server.
 createRenderer({
-  ignoreHTTPSErrors: !!process.env.IGNORE_HTTPS_ERRORS
+  ignoreHTTPSErrors: !!process.env.IGNORE_HTTPS_ERRORS,
 })
   .then(createdRenderer => {
     renderer = createdRenderer
