@@ -8,8 +8,11 @@ class Renderer {
   }
 
   async createPage(url, options = {}) {
-    const { timeout, waitUntil, credentials } = options
+    const { timeout, waitUntil, credentials, emulateMedia } = options
     const page = await this.browser.newPage()
+    if (emulateMedia) {
+      await page.emulateMedia(emulateMedia);
+    }
 
     if (credentials) {
       await page.authenticate(credentials)
@@ -40,7 +43,7 @@ class Renderer {
     let page = null
     try {
       const { timeout, waitUntil, credentials, ...extraOptions } = options
-      page = await this.createPage(url, { timeout, waitUntil, credentials })
+      page = await this.createPage(url, { timeout, waitUntil, credentials, emulateMedia: 'print' })
 
       const { scale = 1.0, displayHeaderFooter, printBackground, landscape } = extraOptions
       const buffer = await page.pdf({
@@ -95,7 +98,7 @@ class Renderer {
 
 async function create(options = {}) {
   const browser = await puppeteer.launch(
-    Object.assign({args: ['--no-sandbox']}, options)
+    Object.assign({args: ['--no-sandbox']}, options, {executablePath: '/usr/bin/chromium-browser'})
   )
   return new Renderer(browser)
 }

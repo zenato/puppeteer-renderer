@@ -20,7 +20,7 @@
   "dependencies": {
     "content-disposition": "^0.5.2",
     "express": "^4.16.3",
-    "puppeteer": "^1.20.0",
+    "puppeteer": "1.19.0",
     "qs": "^6.9.0"
   },
   "devDependencies": {
