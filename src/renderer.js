@@ -46,6 +46,27 @@ class Renderer {
       page = await this.createPage(url, { timeout, waitUntil, credentials, emulateMedia: 'print' })
 
       const { scale = 1.0, displayHeaderFooter, printBackground, landscape } = extraOptions
+
+      if (extraOptions && extraOptions.margin) {
+        extraOptions.margin = JSON.parse(extraOptions.margin);
+      }
+      if (extraOptions && extraOptions['margin-top']) {
+        extraOptions.margin = extraOptions.margin || {};
+        extraOptions.margin.top = extraOptions['margin-top'];
+      }
+      if (extraOptions && extraOptions['margin-right']) {
+        extraOptions.margin = extraOptions.margin || {};
+        extraOptions.margin.right = extraOptions['margin-right'];
+      }
+      if (extraOptions && extraOptions['margin-bottom']) {
+        extraOptions.margin = extraOptions.margin || {};
+        extraOptions.margin.bottom = extraOptions['margin-bottom'];
+      }
+      if (extraOptions && extraOptions['margin-left']) {
+        extraOptions.margin = extraOptions.margin || {};
+        extraOptions.margin.left = extraOptions['margin-left'];
+      }
+
       const buffer = await page.pdf({
         ...extraOptions,
         scale: Number(scale),
