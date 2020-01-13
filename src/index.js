@@ -19,7 +19,7 @@ app.disable('x-powered-by')
 // Render url.
 app.use(async (req, res, next) => {
   console.log(req.query)
-  let { url, type, ...options } = req.query
+  let { url, type, filename, ...options } = req.query
 
   if (!url) {
     return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain')
@@ -33,19 +33,24 @@ app.use(async (req, res, next) => {
     switch (type) {
       case 'pdf':
         const urlObj = new URL(url)
-        let filename = urlObj.hostname
-        if (urlObj.pathname !== '/') {
-          filename = urlObj.pathname.split('/').pop()
-          if (filename === '') filename = urlObj.pathname.replace(/\//g, '')
-          const extDotPosition = filename.lastIndexOf('.')
-          if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
+        if (!filename) {
+          filename = urlObj.hostname
+          if (urlObj.pathname !== '/') {
+            filename = urlObj.pathname.split('/').pop()
+            if (filename === '') filename = urlObj.pathname.replace(/\//g, '')
+            const extDotPosition = filename.lastIndexOf('.')
+            if (extDotPosition > 0) filename = filename.substring(0, extDotPosition)
+          }
+        }
+        if(!filename.toLowerCase().endsWith('.pdf')) {
+          filename += '.pdf';
         }
         const pdf = await renderer.pdf(url, options)
         res
           .set({
             'Content-Type': 'application/pdf',
             'Content-Length': pdf.length,
-            'Content-Disposition': contentDisposition(filename + '.pdf'),
+            'Content-Disposition': contentDisposition(filename),
           })
           .send(pdf)
         break
