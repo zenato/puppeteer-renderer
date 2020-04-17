@@ -42,8 +42,8 @@ class Renderer {
   async pdf(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, credentials, ...extraOptions } = options
-      page = await this.createPage(url, { timeout, waitUntil, credentials, emulateMedia: 'print' })
+      const { timeout, waitUntil, credentials, emulateMedia, ...extraOptions } = options
+      page = await this.createPage(url, { timeout, waitUntil, credentials, emulateMedia: emulateMedia || 'print' })
 
       const { scale = 1.0, displayHeaderFooter, printBackground, landscape } = extraOptions
       const buffer = await page.pdf({
