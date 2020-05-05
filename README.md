@@ -51,19 +51,20 @@ app.listen(8080);
 
 ## API
 
-| Name    | Required | Value               | Description            |Usage                                                         |
-|---------|:--------:|:-------------------:|------------------------|--------------------------------------------------------------|
-|`url`    | yes      |                     |Target URL              |`http://puppeteer-renderer?url=http://www.google.com`         |
-|`type`   |          |`pdf` or `screenshot`|Rendering another type. |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&margin.top=10px`|
-|(Extra options)|    |                     |Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&scale=2`|
+| Name             | Required | Value                     | Description             | Usage                                                         |
+|--------------------|:--------:|:-----------------------:|-------------------------|---------------------------------------------------------------|
+| `url`              | yes      |                         | Target URL              | `http://puppeteer-renderer?url=http://www.google.com`         |
+| `type`             |          | `pdf` or `screenshot`   | Rendering another type. | `http://puppeteer-renderer?url=http://www.google.com&type=pdf&margin.top=10px` |
+| `animationTimeout` |          | Timeout in milliseconds | Waits for animations to finish before taking the screenshot. Only applicable to `type` `screenshot` | `http://puppeteer-renderer?url=http://www.google.com&type=screenshot&animationTimeout=3000` |
+| (Extra options)    |          |                         | Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) |`http://puppeteer-renderer?url=http://www.google.com&type=pdf&scale=2` |
 
 ## PDF File Name Convention
 
 Generated PDFs are returned with a `Content-disposition` header requesting the browser to download the file instead of showing it.
 The file name is generated from the URL rendered:
 
-| URL                                           | Filename                     |   
-|-----------------------------------------------|------------------------------|   
+| URL                                           | Filename                     |
+|-----------------------------------------------|------------------------------|
 | `https://www.example.com/`                    | `www.example.com.pdf`        |
 | `https://www.example.com:80/`                 | `www.example.com.pdf`        |
 | `https://www.example.com/resource`            | `resource.pdf`               |

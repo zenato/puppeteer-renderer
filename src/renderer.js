@@ -1,6 +1,7 @@
 'use strict'
 
 const puppeteer = require('puppeteer')
+const waitForAnimations = require('./wait-for-animations')
 
 class Renderer {
   constructor(browser) {
@@ -11,7 +12,7 @@ class Renderer {
     const { timeout, waitUntil, credentials, emulateMedia } = options
     const page = await this.browser.newPage()
     if (emulateMedia) {
-      await page.emulateMedia(emulateMedia);
+      await page.emulateMedia(emulateMedia)
     }
 
     if (credentials) {
@@ -72,14 +73,21 @@ class Renderer {
       })
 
       const { fullPage, omitBackground, screenshotType, quality, ...restOptions } = extraOptions
-      const buffer = await page.screenshot({
+      let screenshotOptions = {
         ...restOptions,
         type: screenshotType || 'png',
         quality:
           Number(quality) || (screenshotType === undefined || screenshotType === 'png' ? 0 : 100),
         fullPage: fullPage === 'true',
         omitBackground: omitBackground === 'true',
-      })
+      }
+
+      const animationTimeout = Number(options.animationTimeout || 0)
+      if (animationTimeout > 0) {
+        await waitForAnimations(page, screenshotOptions, animationTimeout)
+      }
+
+      const buffer = await page.screenshot(screenshotOptions)
       return {
         screenshotType,
         buffer,
@@ -98,7 +106,7 @@ class Renderer {
 
 async function create(options = {}) {
   const browser = await puppeteer.launch(
-    Object.assign({args: ['--no-sandbox']}, options)
+    Object.assign({ args: ['--no-sandbox'] }, options)
   )
   return new Renderer(browser)
 }
