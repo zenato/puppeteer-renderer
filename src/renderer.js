@@ -93,7 +93,8 @@ class Renderer {
         screenshotType,
         buffer,
       };
-    } finally {
+    }
+    finally {
       this.closePage(page);
     }
   }
@@ -101,6 +102,12 @@ class Renderer {
   async createPage(url, options = {}) {
     const { timeout, waitUntil, credentials, emulateMedia } = options;
     const page = await this.browser.newPage();
+
+    page.on('error', async (error) => {
+      console.error(error);
+      await this.closePage(page);
+    });
+
     if (emulateMedia) {
       await page.emulateMedia(emulateMedia);
     }
@@ -117,11 +124,13 @@ class Renderer {
   }
 
   async closePage(page) {
-    if (page) {
       try {
-        await page.close();
-      } catch (e) {}
-    }
+        if (page && !page.isClosed()) {
+          await page.close();
+        }
+      } catch (e) {
+        console.error(e);
+      }
   }
 
   async close() {
