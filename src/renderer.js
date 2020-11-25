@@ -128,9 +128,7 @@ class Renderer {
         if (page && !page.isClosed()) {
           await page.close();
         }
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) {}
   }
 
   async close() {
