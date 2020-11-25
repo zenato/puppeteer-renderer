@@ -67,7 +67,7 @@ app.use(async (req, res, next) => {
         );
         res
           .set({
-            "Content-Type": `image/${screenshotType}`,
+            "Content-Type": `image/${(screenshotType || 'png')}`,
             "Content-Length": buffer.length,
           })
           .send(buffer);
