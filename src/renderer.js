@@ -27,14 +27,14 @@ class Renderer {
         timeout,
         waitUntil,
         credentials,
-        emulateMedia,
+        emulateMediaType,
         ...extraOptions
       } = options;
       page = await this.createPage(url, {
         timeout,
         waitUntil,
         credentials,
-        emulateMedia: emulateMedia || "print",
+        emulateMediaType: emulateMediaType || "print",
       });
 
       const {
@@ -93,23 +93,22 @@ class Renderer {
         screenshotType,
         buffer,
       };
-    }
-    finally {
+    } finally {
       this.closePage(page);
     }
   }
 
   async createPage(url, options = {}) {
-    const { timeout, waitUntil, credentials, emulateMedia } = options;
+    const { timeout, waitUntil, credentials, emulateMediaType } = options;
     const page = await this.browser.newPage();
 
-    page.on('error', async (error) => {
+    page.on("error", async (error) => {
       console.error(error);
       await this.closePage(page);
     });
 
-    if (emulateMedia) {
-      await page.emulateMedia(emulateMedia);
+    if (emulateMediaType) {
+      await page.emulateMediaType(emulateMediaType);
     }
 
     if (credentials) {
@@ -124,11 +123,11 @@ class Renderer {
   }
 
   async closePage(page) {
-      try {
-        if (page && !page.isClosed()) {
-          await page.close();
-        }
-      } catch (e) {}
+    try {
+      if (page && !page.isClosed()) {
+        await page.close();
+      }
+    } catch (e) {}
   }
 
   async close() {
