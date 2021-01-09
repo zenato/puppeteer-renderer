@@ -131,6 +131,8 @@ class Renderer {
     const { timeout, waitUntil, credentials, emulateMediaType } = await pageSchema.validate(options)
     const page = await this.browser.newPage();
 
+    await page.setCacheEnabled(false);
+
     page.on("error", async (error) => {
       console.error(error);
       await this.closePage(page);
