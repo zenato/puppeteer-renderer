@@ -1,7 +1,58 @@
 "use strict";
 
+const _ = require("lodash")
+const yup = require("yup");
 const puppeteer = require("puppeteer");
+
 const waitForAnimations = require("./wait-for-animations");
+
+const pageSchema = yup.object({
+  timeout: yup.number().default(30 * 1000),
+  waitUntil: yup.string().default('networkidle2'),
+  credentials: yup.string(),
+  emulateMediaType: yup.string(),
+})
+
+const pdfSchema = yup.object({
+  path: yup.string(),
+  scale: yup.number().default(1.0),
+  displayHeaderFooter: yup.boolean(),
+  headerTemplate: yup.string(),
+  footerTemplate: yup.string(),
+  printBackground: yup.boolean(),
+  landscape: yup.boolean(),
+  pageRanges: yup.string(),
+  format: yup.string(),
+  width: yup.string(),
+  height: yup.string(),
+  margin: yup.object({
+    top: yup.string(),
+    right: yup.string(),
+    bottom: yup.string(),
+    left: yup.string(),
+  }),
+  preferCSSPageSize: yup.boolean(),
+})
+
+const screenshotSchema = yup.object({
+  screenshotType: yup.string().default('png'), // instead of `type` property
+  path: yup.string(),
+  quality: yup.number().default(0),
+  fullPage: yup.boolean(),
+  clip: yup.object({
+    x: yup.number().nullable(),
+    y: yup.number().nullable(),
+    width: yup.number().nullable(),
+    height: yup.number().nullable(),
+  }),
+  omitBackground: yup.boolean(),
+  encoding: yup.string(),
+
+  // Extra options
+  width: yup.number().default(800),
+  height: yup.number().default(600),
+  animationTimeout: yup.number().default(0),
+});
 
 class Renderer {
   constructor(browser) {
@@ -37,19 +88,8 @@ class Renderer {
         emulateMediaType: emulateMediaType || "print",
       });
 
-      const {
-        scale = 1.0,
-        displayHeaderFooter,
-        printBackground,
-        landscape,
-      } = extraOptions;
-      const buffer = await page.pdf({
-        ...extraOptions,
-        scale: Number(scale),
-        displayHeaderFooter: displayHeaderFooter === "true",
-        printBackground: printBackground === "true",
-        landscape: landscape === "true",
-      });
+      const pdfOptions = await pdfOptions.validate(extraOptions)
+      const buffer = await page.pdf(pdfOptions);
       return buffer;
     } finally {
       this.closePage(page);
@@ -59,38 +99,27 @@ class Renderer {
   async screenshot(url, options = {}) {
     let page = null;
     try {
-      const { timeout, waitUntil, credentials, ...extraOptions } = options;
-      page = await this.createPage(url, { timeout, waitUntil, credentials });
-      page.setViewport({
-        width: Number(extraOptions.width || 800),
-        height: Number(extraOptions.height || 600),
-      });
-
-      const {
-        fullPage,
-        omitBackground,
-        screenshotType,
-        quality,
-        ...restOptions
-      } = extraOptions;
-      let screenshotOptions = {
-        ...restOptions,
-        type: screenshotType || "png",
+      const { timeout, waitUntil, credentials, ...restOptions } = options;
+      const { width, height, animationTimeout, ...validatedOptions } = await screenshotSchema.validate(restOptions)
+      const screenshotOptions = {
+        ..._.omit(validatedOptions, ["screenshotType"]),
+        type: validatedOptions.screenshotType,
         quality:
-          Number(quality) ||
-          (screenshotType === undefined || screenshotType === "png" ? 0 : 100),
-        fullPage: fullPage === "true",
-        omitBackground: omitBackground === "true",
+          validatedOptions.screenshotType === "png"
+            ? 0
+            : validatedOptions.quality,
       };
 
-      const animationTimeout = Number(options.animationTimeout || 0);
+      page = await this.createPage(url, { timeout, waitUntil, credentials });
+      await page.setViewport({ width, height });
+
       if (animationTimeout > 0) {
         await waitForAnimations(page, screenshotOptions, animationTimeout);
       }
 
       const buffer = await page.screenshot(screenshotOptions);
       return {
-        screenshotType,
+        screenshotType: screenshotOptions.type,
         buffer,
       };
     } finally {
@@ -99,7 +128,7 @@ class Renderer {
   }
 
   async createPage(url, options = {}) {
-    const { timeout, waitUntil, credentials, emulateMediaType } = options;
+    const { timeout, waitUntil, credentials, emulateMediaType } = await pageSchema.validate(options)
     const page = await this.browser.newPage();
 
     page.on("error", async (error) => {
@@ -115,10 +144,7 @@ class Renderer {
       await page.authenticate(credentials);
     }
 
-    await page.goto(url, {
-      timeout: Number(timeout) || 30 * 1000,
-      waitUntil: waitUntil || "networkidle2",
-    });
+    await page.goto(url, { timeout, waitUntil });
     return page;
   }
 

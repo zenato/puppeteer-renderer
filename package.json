@@ -20,10 +20,12 @@
   "dependencies": {
     "content-disposition": "^0.5.2",
     "express": "^4.16.3",
+    "lodash": "^4.17.20",
     "pixelmatch": "^5.2.0",
     "pngjs": "^5.0.0",
     "puppeteer": "^5.5.0",
-    "qs": "^6.9.3"
+    "qs": "^6.9.3",
+    "yup": "^0.32.8"
   },
   "devDependencies": {
     "chai": "^4.2.0",
