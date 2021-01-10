@@ -4,7 +4,7 @@ const PNG = require('pngjs').PNG
 const pixelmatch = require('pixelmatch')
 
 async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 async function waitForAnimations(page, options, timeout = 10000) {
