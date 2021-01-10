@@ -39,12 +39,14 @@ const screenshotSchema = yup.object({
   path: yup.string(),
   quality: yup.number().default(0),
   fullPage: yup.boolean(),
-  clip: yup.object({
-    x: yup.number().nullable(),
-    y: yup.number().nullable(),
-    width: yup.number().nullable(),
-    height: yup.number().nullable(),
-  }),
+  clip: yup
+    .object({
+      x: yup.number(),
+      y: yup.number(),
+      width: yup.number(),
+      height: yup.number(),
+    })
+    .default(undefined),
   omitBackground: yup.boolean(),
   encoding: yup.string(),
 
