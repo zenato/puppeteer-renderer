@@ -84,7 +84,7 @@ class Renderer {
         emulateMediaType: emulateMediaType || 'print',
       })
 
-      const pdfOptions = await pdfOptions.validate(extraOptions)
+      const pdfOptions = await pdfSchema.validate(extraOptions)
       const buffer = await page.pdf(pdfOptions)
       return buffer
     } finally {
