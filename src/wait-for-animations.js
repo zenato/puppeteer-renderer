@@ -14,7 +14,7 @@ async function waitForAnimations(page, options, timeout = 10000) {
   while (new Date().getTime() - t0 < timeout) {
     const current = PNG.sync.read(await page.screenshot({ ...options, type: 'png' }))
 
-    if (previous !== null) {
+    if (previous !== null && (previous.data.length === current.data.length)) {
       const diff = pixelmatch(previous.data, current.data, null, previous.width, previous.height)
       if (diff === 0) {
         return true
