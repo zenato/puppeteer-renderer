@@ -73,18 +73,18 @@ class Renderer {
     }
   }
 
-  async pdf(url, options = {}) {
+  async pdf(url, headers, options = {}) {
     let page = null
     try {
       const { timeout, waitUntil, credentials, emulateMediaType, ...extraOptions } = options
-      page = await this.createPage(url, {
+      page = await this.createPage(url, headers, {
         timeout,
         waitUntil,
         credentials,
         emulateMediaType: emulateMediaType || 'print',
       })
-
       const pdfOptions = await pdfSchema.validate(extraOptions)
+      
       const buffer = await page.pdf(pdfOptions)
       return buffer
     } finally {
@@ -125,10 +125,16 @@ class Renderer {
     }
   }
 
-  async createPage(url, options = {}) {
+  async createPage(url, headers, options = {}) {
     const { timeout, waitUntil, credentials, emulateMediaType } = await pageSchema.validate(options)
     const page = await this.browser.newPage()
 
+    if (headers) {
+      await page.setExtraHTTPHeaders(
+        JSON.parse(headers)
+      )
+    }
+    
     await page.setCacheEnabled(false)
 
     page.on('error', async error => {
