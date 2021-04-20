@@ -44,8 +44,8 @@ app.use(async (req, res, next) => {
         if (!filename.toLowerCase().endsWith('.pdf')) {
           filename += '.pdf'
         }
-        const { contentDispositionType, headers, ...pdfOptions } = options
-        const pdf = await renderer.pdf(url, headers, pdfOptions)
+        const { contentDispositionType, ...pdfOptions } = options
+        const pdf = await renderer.pdf(url, pdfOptions)
         res
           .set({
             'Content-Type': 'application/pdf',
