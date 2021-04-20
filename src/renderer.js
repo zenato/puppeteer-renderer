@@ -64,8 +64,8 @@ class Renderer {
   async html(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, credentials } = options
-      page = await this.createPage(url, { timeout, waitUntil, credentials })
+      const { timeout, waitUntil, headers, credentials } = options
+      page = await this.createPage(url, headers, { timeout, waitUntil, credentials })
       const html = await page.content()
       return html
     } finally {
@@ -73,10 +73,10 @@ class Renderer {
     }
   }
 
-  async pdf(url, headers, options = {}) {
+  async pdf(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, credentials, emulateMediaType, ...extraOptions } = options
+      const { timeout, waitUntil, credentials, emulateMediaType, headers, ...extraOptions } = options
       page = await this.createPage(url, headers, {
         timeout,
         waitUntil,
@@ -95,7 +95,7 @@ class Renderer {
   async screenshot(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, credentials, ...restOptions } = options
+      const { timeout, waitUntil, credentials, headers, ...restOptions } = options
       const {
         width,
         height,
@@ -108,7 +108,7 @@ class Renderer {
         quality: validatedOptions.screenshotType === 'png' ? 0 : validatedOptions.quality,
       }
 
-      page = await this.createPage(url, { timeout, waitUntil, credentials })
+      page = await this.createPage(url, headers, { timeout, waitUntil, credentials })
       await page.setViewport({ width, height })
 
       if (animationTimeout > 0) {
