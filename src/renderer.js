@@ -10,6 +10,7 @@ const pageSchema = yup.object({
   timeout: yup.number().default(30 * 1000),
   waitUntil: yup.string().default('networkidle2'),
   credentials: yup.string(),
+  headers: yup.string(),
   emulateMediaType: yup.string(),
 })
 
@@ -64,8 +65,8 @@ class Renderer {
   async html(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, headers, credentials } = options
-      page = await this.createPage(url, headers, { timeout, waitUntil, credentials })
+      const { timeout, waitUntil, credentials, headers } = options
+      page = await this.createPage(url, { timeout, waitUntil, credentials, headers })
       const html = await page.content()
       return html
     } finally {
@@ -76,11 +77,12 @@ class Renderer {
   async pdf(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, credentials, emulateMediaType, headers, ...extraOptions } = options
-      page = await this.createPage(url, headers, {
+      const { timeout, waitUntil, credentials, headers, emulateMediaType, ...extraOptions } = options
+      page = await this.createPage(url, {
         timeout,
         waitUntil,
         credentials,
+        headers,
         emulateMediaType: emulateMediaType || 'print',
       })
       const pdfOptions = await pdfSchema.validate(extraOptions)
@@ -108,7 +110,7 @@ class Renderer {
         quality: validatedOptions.screenshotType === 'png' ? 0 : validatedOptions.quality,
       }
 
-      page = await this.createPage(url, headers, { timeout, waitUntil, credentials })
+      page = await this.createPage(url, { timeout, waitUntil, credentials, headers })
       await page.setViewport({ width, height })
 
       if (animationTimeout > 0) {
@@ -125,14 +127,12 @@ class Renderer {
     }
   }
 
-  async createPage(url, headers, options = {}) {
-    const { timeout, waitUntil, credentials, emulateMediaType } = await pageSchema.validate(options)
+  async createPage(url, options = {}) {
+    const { timeout, waitUntil, credentials, emulateMediaType, headers } = await pageSchema.validate(options)
     const page = await this.browser.newPage()
 
     if (headers) {
-      await page.setExtraHTTPHeaders(
-        JSON.parse(headers)
-      )
+      await page.setExtraHTTPHeaders(JSON.parse(headers))
     }
     
     await page.setCacheEnabled(false)
