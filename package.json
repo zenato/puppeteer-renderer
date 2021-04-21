@@ -2,7 +2,7 @@
   "name": "puppeteer-renderer",
   "author": "yeongjinnn@gmail.com",
   "private": true,
-  "version": "2.1.2",
+  "version": "2.1.4",
   "description": "",
   "main": "src/index.js",
   "scripts": {
