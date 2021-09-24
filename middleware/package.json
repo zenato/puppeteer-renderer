@@ -10,7 +10,7 @@
     "url": "https://github.com/zenato/puppeteer-renderer"
   },
   "homepage": "https://github.com/zenato/puppeteer-renderer/tree/master/middleware",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "An Express middleware for SSR using puppeteer-renderer",
   "main": "./dist/index.js",
   "license": "MIT",
