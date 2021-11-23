@@ -168,7 +168,7 @@ class Renderer {
 }
 
 async function create(options = {}) {
-  const browser = await puppeteer.launch(Object.assign({ args: ['--no-sandbox'] }, options))
+  const browser = await puppeteer.launch(Object.assign({ args: ['--no-sandbox', '--disable-web-security'] }, options))
   return new Renderer(browser)
 }
 
