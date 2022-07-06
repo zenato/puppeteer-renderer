@@ -83,19 +83,33 @@ app.use((err, req, res, next) => {
 })
 
 // Create renderer and start server.
+let puppeteerArgs = process.env.PUPPETEER_ARGS
+
 createRenderer({
   ignoreHTTPSErrors: !!process.env.IGNORE_HTTPS_ERRORS,
+  // We want to support multiple args in a string, to support spaces we will use -- as the separator
+  // and rebuild the array with valid values:
+  // '--host-rules=MAP localhost yourproxy --test' -> ['', 'host-rules=MAP localhost yourproxy', '', 'test'] -> ['--host-rules=MAP localhost yourproxy', '--test']
+  args:
+    typeof puppeteerArgs === 'string'
+      ? puppeteerArgs
+          .split('--')
+          .filter(value => value !== '')
+          .map(function (value) {
+            return '--' + value
+          })
+      : [],
 })
   .then(createdRenderer => {
     renderer = createdRenderer
-    console.info('Initialized renderer.')
+    console.info('Initialized renderer.', renderer.browserOptions)
 
     app.listen(port, () => {
       console.info(`Listen port on ${port}.`)
     })
   })
   .catch(e => {
-    console.error('Fail to initialze renderer.', e)
+    console.error('Fail to initialize renderer.', e)
   })
 
 // Terminate process

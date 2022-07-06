@@ -9,21 +9,39 @@ You can run Chromium or docker.
 
 ## Getting Started
 
-### Install dependencies.
+### Start server using docker (If you can not run Chromium and installed docker)
+
+```bash
+docker run -d --name renderer -p 8080:3000 zenato/puppeteer-renderer
+```
+
+### Local (git clone)
+
 `npm install`
 
-### Start server (If you can run Chromium)
+#### Start server (If you can run Chromium)
 `npm start`
 
 (service port: 3000)
 
-### Start server using docker (If you can not run Chromium and installed docker)
-`docker run -d --name renderer -p 8080:3000 zenato/puppeteer-renderer`
+#### Locally build the image
+
+```bash
+docker build -t local/puppeteer-renderer .
+docker run -d --name renderer -p 8080:3000 local/puppeteer-renderer
+```
 
 ### Test on your browser
 Input url `http://localhost:{port}/?url=https://www.google.com`
 
 If you can see html code, server works fine.
+
+### Puppeteer customization
+
+When starting `npm start` or docker container you can customize puppeteer using environment variables.
+
+- `IGNORE_HTTPS_ERRORS=true` - Ignores HTTPS errors
+- `PUPPETEER_ARGS='--host-rules=MAP localhost yourproxy'` - Ads additional args that will be passed to puppeteer. Supports multiple arguments.
 
 ## Integration with existing service.
 
