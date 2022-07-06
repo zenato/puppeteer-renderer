@@ -58,7 +58,8 @@ const screenshotSchema = yup.object({
 })
 
 class Renderer {
-  constructor(browser) {
+  constructor(browser, browserOptions) {
+    this.browserOptions = browserOptions
     this.browser = browser
   }
 
@@ -77,7 +78,8 @@ class Renderer {
   async pdf(url, options = {}) {
     let page = null
     try {
-      const { timeout, waitUntil, credentials, headers, emulateMediaType, ...extraOptions } = options
+      const { timeout, waitUntil, credentials, headers, emulateMediaType, ...extraOptions } =
+        options
       page = await this.createPage(url, {
         timeout,
         waitUntil,
@@ -86,7 +88,7 @@ class Renderer {
         emulateMediaType: emulateMediaType || 'print',
       })
       const pdfOptions = await pdfSchema.validate(extraOptions)
-      
+
       const buffer = await page.pdf(pdfOptions)
       return buffer
     } finally {
@@ -98,12 +100,8 @@ class Renderer {
     let page = null
     try {
       const { timeout, waitUntil, credentials, headers, ...restOptions } = options
-      const {
-        width,
-        height,
-        animationTimeout,
-        ...validatedOptions
-      } = await screenshotSchema.validate(restOptions)
+      const { width, height, animationTimeout, ...validatedOptions } =
+        await screenshotSchema.validate(restOptions)
       const screenshotOptions = {
         ..._.omit(validatedOptions, ['screenshotType']),
         type: validatedOptions.screenshotType,
@@ -128,13 +126,14 @@ class Renderer {
   }
 
   async createPage(url, options = {}) {
-    const { timeout, waitUntil, credentials, emulateMediaType, headers } = await pageSchema.validate(options)
+    const { timeout, waitUntil, credentials, emulateMediaType, headers } =
+      await pageSchema.validate(options)
     const page = await this.browser.newPage()
 
     if (headers) {
       await page.setExtraHTTPHeaders(JSON.parse(headers))
     }
-    
+
     await page.setCacheEnabled(false)
 
     page.on('error', async error => {
@@ -168,8 +167,17 @@ class Renderer {
 }
 
 async function create(options = {}) {
-  const browser = await puppeteer.launch(Object.assign({ args: ['--no-sandbox', '--disable-web-security'] }, options))
-  return new Renderer(browser)
+  // Allows custom ars
+  if (typeof options.args === 'undefined' || !(options.args instanceof Array)) {
+    options.args = []
+  }
+
+  options.args.push('--no-sandbox')
+  options.args.push('--disable-web-security')
+
+  const browser = await puppeteer.launch(options)
+
+  return new Renderer(browser, options)
 }
 
 module.exports = create

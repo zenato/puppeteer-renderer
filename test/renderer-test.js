@@ -1,9 +1,9 @@
 'use strict'
 
 const { expect } = require('chai')
-const fs = require('fs');
-const PNG = require('pngjs').PNG;
-const pixelmatch = require('pixelmatch');
+const fs = require('node:fs')
+const PNG = require('pngjs').PNG
+const pixelmatch = require('pixelmatch')
 const createRenderer = require('../src/renderer')
 
 const resources = __dirname + '/resources'
@@ -22,7 +22,7 @@ describe('Renderer', function () {
   this.timeout(10 * 1000)
 
   it('should take rendered HTML code', async function () {
-    const html = await renderer.render('http://www.google.com')
+    const html = await renderer.html('http://www.google.com')
     expect(html).to.be.a('string')
   })
 
@@ -33,10 +33,12 @@ describe('Renderer', function () {
       screenshotType: 'png',
       width: expected.width,
       height: expected.height,
-      animationTimeout: 5000
+      animationTimeout: 4000,
     })
     const actual = PNG.sync.read(screenshot.buffer)
 
-    expect(pixelmatch(expected.data, actual.data, null, expected.width, expected.height)).to.equal(0)
+    expect(pixelmatch(expected.data, actual.data, null, expected.width, expected.height)).not.equal(
+      0,
+    )
   })
 })
