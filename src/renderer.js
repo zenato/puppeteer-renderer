@@ -175,6 +175,11 @@ async function create(options = {}) {
   options.args.push('--no-sandbox')
   options.args.push('--disable-web-security')
 
+  // Support proxies
+  if(process.env.PROXY) {
+    options.args.push('--proxy-server=' + process.env.PROXY)
+  }
+
   const browser = await puppeteer.launch(options)
 
   return new Renderer(browser, options)
