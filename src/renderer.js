@@ -71,7 +71,7 @@ class Renderer {
       const html = await page.content()
       return html
     } finally {
-      this.closePage(page)
+      await this.closePage(page)
     }
   }
 
@@ -92,7 +92,7 @@ class Renderer {
       const buffer = await page.pdf(pdfOptions)
       return buffer
     } finally {
-      this.closePage(page)
+      await this.closePage(page)
     }
   }
 
@@ -121,7 +121,7 @@ class Renderer {
         buffer,
       }
     } finally {
-      this.closePage(page)
+      await this.closePage(page)
     }
   }
 
@@ -139,6 +139,7 @@ class Renderer {
     page.on('error', async error => {
       console.error(error)
       await this.closePage(page)
+      throw error
     })
 
     if (emulateMediaType) {
@@ -149,7 +150,11 @@ class Renderer {
       await page.authenticate(credentials)
     }
 
-    await page.goto(url, { timeout, waitUntil })
+    await page.goto(url, {timeout, waitUntil}).catch(async (e) => {
+      await this.closePage(page)
+      throw e
+    })
+
     return page
   }
 

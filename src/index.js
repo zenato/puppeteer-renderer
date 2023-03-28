@@ -21,7 +21,7 @@ app.use(async (req, res, next) => {
   let { url, type, filename, ...options } = req.query
 
   if (!url) {
-    return res.status(400).send('Search with url parameter. For eaxample, ?url=http://yourdomain')
+    return res.status(400).send('Search with url parameter. For example, ?url=http://yourdomain')
   }
 
   if (!url.includes('://')) {
@@ -86,6 +86,7 @@ app.use((err, req, res, next) => {
 let puppeteerArgs = process.env.PUPPETEER_ARGS
 
 createRenderer({
+  //devtools:true,
   ignoreHTTPSErrors: !!process.env.IGNORE_HTTPS_ERRORS,
   // We want to support multiple args in a string, to support spaces we will use -- as the separator
   // and rebuild the array with valid values:
