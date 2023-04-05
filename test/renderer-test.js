@@ -38,7 +38,7 @@ describe('Renderer', function () {
     const actual = PNG.sync.read(screenshot.buffer)
 
     expect(pixelmatch(expected.data, actual.data, null, expected.width, expected.height)).not.equal(
-      0,
+      0
     )
   })
 })
