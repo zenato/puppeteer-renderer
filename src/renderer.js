@@ -128,7 +128,7 @@ class Renderer {
   async createPage(url, options = {}) {
     const { timeout, waitUntil, credentials, emulateMediaType, headers } =
       await pageSchema.validate(options)
-    const page = null
+    let page = null
 
     try {
       page = await this.browser.newPage()
