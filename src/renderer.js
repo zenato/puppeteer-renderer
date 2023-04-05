@@ -128,34 +128,37 @@ class Renderer {
   async createPage(url, options = {}) {
     const { timeout, waitUntil, credentials, emulateMediaType, headers } =
       await pageSchema.validate(options)
-    const page = await this.browser.newPage()
+    const page = null
 
-    if (headers) {
-      await page.setExtraHTTPHeaders(JSON.parse(headers))
-    }
+    try {
+      page = await this.browser.newPage()
 
-    await page.setCacheEnabled(false)
+      if (headers) {
+        await page.setExtraHTTPHeaders(JSON.parse(headers))
+      }
 
-    page.on('error', async error => {
-      console.error(error)
-      await this.closePage(page)
-      throw error
-    })
+      await page.setCacheEnabled(false)
 
-    if (emulateMediaType) {
-      await page.emulateMediaType(emulateMediaType)
-    }
+      page.on('error', error => {
+        throw error
+      })
 
-    if (credentials) {
-      await page.authenticate(credentials)
-    }
+      if (emulateMediaType) {
+        await page.emulateMediaType(emulateMediaType)
+      }
 
-    await page.goto(url, {timeout, waitUntil}).catch(async (e) => {
+      if (credentials) {
+        await page.authenticate(credentials)
+      }
+
+      await page.goto(url, { timeout, waitUntil })
+
+      return page
+    } catch (e) {
+      console.error(e)
       await this.closePage(page)
       throw e
-    })
-
-    return page
+    }
   }
 
   async closePage(page) {
