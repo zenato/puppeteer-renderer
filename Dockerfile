@@ -8,10 +8,14 @@ WORKDIR /app
 
 COPY . ./
 
-RUN npm i
+RUN npm install pnpm -g
+
+RUN pnpm i
+
+RUN pnpm run build
 
 RUN chown -R pptruser:pptruser /app
 
 USER pptruser
 
-CMD npm run start
+CMD pnpm run start
