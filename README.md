@@ -12,7 +12,7 @@ You can run Chromium or docker.
 ### Start server using docker (If you can not run Chromium and installed docker)
 
 ```bash
-docker run -d --name renderer -p 8080:3000 zenato/puppeteer-renderer
+docker run -d --name renderer -p 8080:3000 ghcr.io/zenato/puppeteer-renderer:latest
 ```
 
 ### Local (git clone)
