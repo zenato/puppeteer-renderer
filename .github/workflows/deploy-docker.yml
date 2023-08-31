@@ -7,7 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: puppeteer-renderer
+  IMAGE_NAME: ${{ github.repository }}
+  SCOPE: puppeteer-renderer
 
 jobs:
   push:
@@ -40,5 +41,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            SCOPE=puppeteer-renderer
+            SCOPE=${{ env.SCOPE }}
             PORT=3000
