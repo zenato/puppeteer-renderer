@@ -8,7 +8,7 @@ on:
       - packages/puppeteer-renderer/**
     tags:
       - v*
-  pull_request:
+  #pull_request:
 
 env:
   IMAGE_NAME: puppeteer-renderer
