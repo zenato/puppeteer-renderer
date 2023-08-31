@@ -9,14 +9,15 @@ An Express middleware for SSR using [puppeteer-renderer](http://github.com/zenat
 $ npm install --save express puppeteer-renderer-middleware
 ```
 
-```js
-const express = require('express');
-const puppeteerRenderer = require('puppeteer-renderer-middleware');
+```ts
+import express from 'express'
+import puppeteerRenderer from 'puppeteer-renderer-middleware'
 
 const app = express();
 
-app.use(puppeteerRenderer({
-  url: 'http://puppeteer-renderer/render',
+// Use puppeteer-renderer middleware
+app.use('/render', puppeteerRenderer({
+  url: 'http://puppeteer-renderer:3030',
   // userAgentPattern: /My-Custom-Agent/i,
   // excludeUrlPattern: /*.html$/i
   // timeout: 30 * 1000,
@@ -24,7 +25,7 @@ app.use(puppeteerRenderer({
 
 // other codes..
 
-app.listen(8080);
+app.listen(3000);
 ```
 
 ## Configuration

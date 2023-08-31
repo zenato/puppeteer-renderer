@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Router, NextFunction, Request, Response } from 'express'
 
 const botUserAgents = [
   'W3C_Validator',
@@ -61,32 +62,43 @@ const staticFileExtensions = [
   'zip',
 ]
 
-module.exports = function(options) {
+interface Options {
+  url: string
+  userAgentPattern?: RegExp
+  excludeUrlPattern?: RegExp
+  timeout?: number
+}
+
+export default function (options: Options) {
   if (!options || !options.url) {
     throw new Error('Must set url.')
   }
 
-  let rendererUrl = options.url
-
   const userAgentPattern = options.userAgentPattern || new RegExp(botUserAgents.join('|'), 'i')
   const excludeUrlPattern =
     options.excludeUrlPattern || new RegExp(`\\.(${staticFileExtensions.join('|')})$`, 'i')
-  const timeout = options.timeout || 10 * 1000
 
-  return (req, res, next) => {
-    if (!userAgentPattern.test(req.headers['user-agent']) || excludeUrlPattern.test(req.path)) {
+  const middleware = async (req: Request, res: Response, next: NextFunction) => {
+    if (
+      userAgentPattern.test(req.headers['user-agent'] as string) ||
+      excludeUrlPattern.test(req.path)
+    ) {
       return next()
     }
 
-    const requestUrl = encodeURIComponent(`${req.protocol}://${req.get('host')}${req.originalUrl}`)
-    let renderUrl = `${rendererUrl}?url=${requestUrl}`
-
-    axios
-      .get(renderUrl, { timeout })
-      .then(({ data }) => res.send(data))
-      .catch(e => next(e))
+    try {
+      const { data } = await axios.get(`${options.url}${req.url}`, {
+        timeout: options.timeout || 10 * 1000,
+      })
+      res.send(data)
+    } catch (e) {
+      next(e)
+    }
   }
-}
 
-exports.botUserAgents = botUserAgents
-exports.staticFileExtensions = staticFileExtensions
+  const router = Router()
+
+  router.get(['/html', '/pdf', '/screenshot'], middleware)
+
+  return router
+}
