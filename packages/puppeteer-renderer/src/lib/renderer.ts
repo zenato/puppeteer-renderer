@@ -6,7 +6,7 @@ import {
   PageViewportOptions,
   PdfOptions,
   ScreenshotOptions,
-} from '../lib/validate-schema'
+} from './validate-schema'
 
 export class Renderer {
   private browser: Browser

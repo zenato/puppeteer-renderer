@@ -6,7 +6,7 @@ An Express middleware for SSR using [puppeteer-renderer](http://github.com/zenat
 ## Usage
 
 ```bash
-$ npm install --save express puppeteer-renderer-middleware
+$ pnpm install express puppeteer-renderer-middleware
 ```
 
 ```ts
@@ -25,7 +25,7 @@ app.use('/render', puppeteerRenderer({
 
 // other codes..
 
-app.listen(3000);
+app.listen(3030);
 ```
 
 ## Configuration
