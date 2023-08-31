@@ -1,27 +1,25 @@
-name: Deploy docker
+name: Deploy puppeteer-renderer docker image
 
-# This workflow runs when any of the following occur:
-# - A push is made to a branch called `main` or `seed`
-# - A tag starting with "v" is created
-# - A pull request is created or updated
 on:
   push:
     branches:
-      - main,
+      - main
     paths:
       - packages/puppeteer-renderer/**
+    tags:
+      - v*
   pull_request:
+
 env:
   IMAGE_NAME: puppeteer-renderer
-#
+
 jobs:
-  # This pushes the image to GitHub Packages.
   push:
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-      #
+
     steps:
       - uses: actions/checkout@v3
 
@@ -31,19 +29,21 @@ jobs:
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-        with:
-          path: packages/puppeteer-renderer
-        
       - name: Push image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-          VERSION=${{ steps.package-version.outputs.current-version}}
+
+          # This changes all uppercase characters to lowercase.
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # This strips the git ref prefix from the version.
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # This strips the "v" prefix from the tag name.
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # This uses the Docker `latest` tag convention.
+          [ "$VERSION" == "main" ] && VERSION=latest
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
+
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-
