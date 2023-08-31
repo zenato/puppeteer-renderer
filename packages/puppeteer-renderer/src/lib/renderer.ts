@@ -127,7 +127,7 @@ export default async function create(options: PuppeteerLaunchOptions = {}) {
   options.args.push('--no-sandbox')
   options.args.push('--disable-web-security')
 
-  const browser = await puppeteer.launch(options)
+  const browser = await puppeteer.launch({ ...options, headless: 'new' })
 
   renderer = new Renderer(browser)
 
