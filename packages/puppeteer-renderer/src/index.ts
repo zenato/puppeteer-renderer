@@ -29,6 +29,7 @@ app.use((req: Request, res: Response) => {
 })
 
 // Error page.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err)
   res.status(500).send('Oops, An expected error seems to have occurred.')
