@@ -16,7 +16,11 @@ app.use(router)
 
 // Index
 app.get('/', (req: Request, res: Response) => {
-  res.status(200).send(`You can use <a href="/html">/html</a>, <a href="/screenshot">/screenshot</a> or <a href="/pdf">/pdf</a> endpoint.`)
+  res
+    .status(200)
+    .send(
+      `You can use <a href="/html">/html</a>, <a href="/screenshot">/screenshot</a> or <a href="/pdf">/pdf</a> endpoint.`,
+    )
 })
 
 // Not found page.

@@ -17,11 +17,10 @@ docker run -d --name renderer -p 8080:3000 ghcr.io/zenato/puppeteer-renderer:lat
 
 ### Local (git clone)
 
-`npm install`
+`pnpm install`
 
 #### Start server (If you can run Chromium)
-`npm start`
-
+`pnpm dev`
 (service port: 3000)
 
 #### Locally build the image
@@ -38,7 +37,7 @@ If you can see html code, server works fine.
 
 ### Puppeteer customization
 
-When starting `npm start` or docker container you can customize puppeteer using environment variables.
+When starting `pnpm {dev|start}` or docker container you can customize puppeteer using environment variables.
 
 - `IGNORE_HTTPS_ERRORS=true` - Ignores HTTPS errors
 - `PUPPETEER_ARGS='--host-rules=MAP localhost yourproxy'` - Ads additional args that will be passed to puppeteer. Supports multiple arguments.
@@ -46,14 +45,15 @@ When starting `npm start` or docker container you can customize puppeteer using 
 ## Integration with existing service.
 
 If you have active service, set proxy configuration with middleware.
-See [puppeteer-renderer-middleware](middleware/README.md) for express.
+See [puppeteer-renderer-middleware](packages/middleware/README.md) for express.
 
-```js
-const renderer = require('puppeteer-renderer-middleware');
+```ts
+import express from 'express'
+import renderer from 'puppeteer-renderer-middleware'
 
-const app = express();
+const app = express()
 
-app.use(renderer({
+app.use('/render-proxy', renderer({
   url: 'http://installed-your-puppeteer-renderer-url',
   // userAgentPattern: /My-Custom-Agent/i,
   // excludeUrlPattern: /*.html$/i
