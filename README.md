@@ -26,7 +26,8 @@ docker run -d --name renderer -p 8080:3000 ghcr.io/zenato/puppeteer-renderer:lat
 #### Locally build the image
 
 ```bash
-docker build -t local/puppeteer-renderer .
+docker build . --file ./Dockerfile --tag local/puppeteer-renderer --build-arg SCOPE=puppeteer-renderer
+```
 docker run -d --name renderer -p 8080:3000 local/puppeteer-renderer
 ```
 
