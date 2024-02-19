@@ -1,4 +1,4 @@
-FROM ghcr.io/puppeteer/puppeteer:21.1.1 as base
+FROM ghcr.io/puppeteer/puppeteer:22.1.0 as base
 
 WORKDIR /app
 
