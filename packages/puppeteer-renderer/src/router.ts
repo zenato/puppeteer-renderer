@@ -7,11 +7,11 @@ import contentDisposition from 'content-disposition'
 const router = express.Router()
 
 const urlSchema = yup.object({ url: yup.string().required() }).transform(current => {
-  if (current.url.includes('://')) {
-    return current
+  const regex = /^https?:\/\//;
+  if (!regex.test(current.url)) {
+    current.url = `https://${current.url}`
   }
-  current.url = 'https://' + current.url
-  return current
+  return current;
 })
 
 router.get('/html', async (req, res, next) => {
