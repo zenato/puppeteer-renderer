@@ -4,6 +4,11 @@ WORKDIR /app
 
 USER root
 
+RUN apt-get update && \
+    apt-get install -y tini && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ARG SCOPE
 ENV SCOPE=$SCOPE
 
@@ -45,4 +50,5 @@ EXPOSE $PORT
 RUN chown -R pptruser:pptruser /app
 USER pptruser
 
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD pnpm --filter=$SCOPE run start
