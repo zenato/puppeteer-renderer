@@ -128,10 +128,14 @@ export default async function create(options: PuppeteerLaunchOptions = {}) {
   options.args.push('--no-sandbox')
   options.args.push('--disable-web-security')
 
+  // disable cache
+  options.args.push('--disable-dev-shm-usage')
+  options.args.push('--disk-cache-size=0')
+  options.args.push('--aggressive-cache-discard')
+
   const browser = await puppeteer.launch({
     ...options,
     headless: 'shell',
-    userDataDir: '/dev/null'
   })
 
   renderer = new Renderer(browser)
