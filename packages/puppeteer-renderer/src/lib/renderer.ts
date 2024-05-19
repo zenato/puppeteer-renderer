@@ -1,5 +1,4 @@
-import _ from 'lodash'
-import puppeteer, { Browser, PDFOptions, Page, PuppeteerLaunchOptions } from 'puppeteer'
+import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
 import waitForAnimations from './wait-for-animations'
 import {
   PageOptions,
@@ -108,7 +107,9 @@ export class Renderer {
       if (page && !page.isClosed()) {
         await page.close()
       }
-    } catch (e) {}
+    } catch (e) {
+      // ignore
+    }
   }
 
   async close() {
@@ -129,7 +130,7 @@ export default async function create(options: PuppeteerLaunchOptions = {}) {
 
   const browser = await puppeteer.launch({
     ...options,
-    headless: 'new',
+    headless: 'shell',
     userDataDir: '/dev/null'
   })
 
