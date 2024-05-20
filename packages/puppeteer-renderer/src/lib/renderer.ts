@@ -63,7 +63,7 @@ export class Renderer {
 
       const buffer = await page.screenshot({
         ...options,
-        quality: options.type === 'png' ? 0 : options.quality,
+        quality: options.type === 'png' ? undefined : options.quality,
       })
 
       return {
