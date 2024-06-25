@@ -126,7 +126,6 @@ export default async function create(options: PuppeteerLaunchOptions = {}) {
   }
 
   options.args.push('--no-sandbox')
-  options.args.push('--disable-web-security')
 
   // disable cache
   options.args.push('--disable-dev-shm-usage')
