@@ -1,0 +1,7 @@
+services:
+  puppeteer-renderer:
+    image: ghcr.io/zenato/puppeteer-renderer:latest
+    container_name: puppeteer-renderer
+    restart: unless-stopped
+    ports:
+      - ${PORT}:3000
