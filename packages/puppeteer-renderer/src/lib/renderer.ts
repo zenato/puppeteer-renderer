@@ -1,145 +1,65 @@
-import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
-import waitForAnimations from './wait-for-animations'
-import {
-  PageOptions,
-  PageViewportOptions,
-  PdfOptions,
-  ScreenshotOptions,
-} from './validate-schema'
+import puppeteer from 'puppeteer'
 
-export class Renderer {
-  private browser: Browser
+import type { PageOptions, PDFOptions, ScreenshotOptions, Viewport } from './types'
 
-  constructor(browser: Browser) {
+class Renderer {
+  private browser: puppeteer.Browser
+
+  constructor(browser: puppeteer.Browser) {
     this.browser = browser
   }
 
-  async html(url: string, pageOptions: PageOptions) {
-    let page: Page | undefined = undefined
-
-    try {
-      page = await this.createPage(url, pageOptions)
-      const html = await page.content()
-      return html
-    } finally {
-      await this.closePage(page)
+  private async createPage(options: PageOptions) {
+    const page = await this.browser.newPage()
+    if (options.headers) {
+      await page.setExtraHTTPHeaders(options.headers)
     }
+    if (options.userAgent) {
+      await page.setUserAgent(options.userAgent)
+    }
+    if (options.viewport) {
+      await page.setViewport(options.viewport)
+    }
+    return page
   }
 
-  async pdf(url: string, pageOptions: PageOptions, pdfOptions: PdfOptions) {
-    let page: Page | undefined = undefined
-
-    try {
-      page = await this.createPage(url, {
-        ...pageOptions,
-        emulateMediaType: pageOptions.emulateMediaType || 'print',
-      })
-
-      const buffer = await page.pdf(pdfOptions)
-      return buffer
-    } finally {
-      await this.closePage(page)
+  async html(url: string, options: PageOptions = {}) {
+    const page = await this.createPage(options)
+    await page.goto(url, {
+      waitUntil: options.waitUntil || 'load',
+      timeout: options.timeout || 30000
+    })
+    if (options.extraTimeout > 0) {
+      await page.waitForTimeout(options.extraTimeout)
     }
+    const html = await page.content()
+    await page.close()
+    return html
   }
 
   async screenshot(
     url: string,
-    pageOptions: PageOptions,
-    pageViewportOptions: PageViewportOptions,
+    options: PageOptions = {},
+    viewport: Viewport,
     screenshotOptions: ScreenshotOptions
   ) {
-    let page: Page | undefined = undefined
-
-    try {
-      page = await this.createPage(url, pageOptions)
-
-      await page.setViewport(pageViewportOptions)
-
-      const { animationTimeout, ...options } = screenshotOptions
-
-      if (animationTimeout > 0) {
-        await waitForAnimations(page, screenshotOptions, animationTimeout)
-      }
-
-      const buffer = await page.screenshot({
-        ...options,
-        quality: options.type === 'png' ? undefined : options.quality,
-      })
-
-      return {
-        type: options.type,
-        buffer,
-      }
-    } finally {
-      await this.closePage(page)
+    const page = await this.createPage(options)
+    if (viewport) {
+      await page.setViewport(viewport)
     }
+    await page.goto(url)
+    const buffer = await page.screenshot(screenshotOptions)
+    await page.close()
+    return { type: screenshotOptions.type || 'png', buffer }
   }
 
-  async createPage(url: string, pageOptions: PageOptions) {
-    let page: Page | undefined = undefined
-
-    try {
-      page = await this.browser.newPage()
-
-      page.on('error', error => {
-        throw error
-      })
-
-      const { credentials, emulateMediaType, headers, ...options } = pageOptions
-
-      headers && (await page.setExtraHTTPHeaders(JSON.parse(headers)))
-      emulateMediaType && (await page.emulateMediaType(emulateMediaType))
-      credentials && (await page.authenticate(credentials))
-
-      await page.setCacheEnabled(false)
-      await page.goto(url, options)
-
-      return page
-    } catch (e) {
-      console.error(e)
-      await this.closePage(page)
-      throw e
-    }
-  }
-
-  async closePage(page?: Page) {
-    try {
-      if (page && !page.isClosed()) {
-        await page.close()
-      }
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  async close() {
-    await this.browser.close()
+  async pdf(url: string, options: PageOptions = {}, pdfOptions: PDFOptions) {
+    const page = await this.createPage(options)
+    await page.goto(url)
+    const pdf = await page.pdf(pdfOptions)
+    await page.close()
+    return pdf
   }
 }
 
-export let renderer: Renderer | undefined = undefined
-
-export default async function create(options: PuppeteerLaunchOptions = {}) {
-  // Allows custom ars
-  if (typeof options.args === 'undefined' || !(options.args instanceof Array)) {
-    options.args = []
-  }
-
-  options.args.push('--no-sandbox')
-
-  // disable cache
-  options.args.push('--disable-dev-shm-usage')
-  options.args.push('--disk-cache-size=0')
-  options.args.push('--aggressive-cache-discard')
-
-  const browser = await puppeteer.launch({
-    ...options,
-    headless: 'shell',
-  })
-
-  renderer = new Renderer(browser)
-
-  console.info(`Initialized renderer.`, options)
-
-  return renderer
-}
+export { Renderer }
