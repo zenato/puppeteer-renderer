@@ -20,53 +20,51 @@ export const pageSchema = yup.object({
 export type PageOptions = yup.InferType<typeof pageSchema>
 
 export const pageViewportSchema = yup.object({
-  width: yup.number().default(800),
-  height: yup.number().default(600),
+  width: yup.number().required(),
+  height: yup.number().required(),
+  deviceScaleFactor: yup.number().default(1),
+  isMobile: yup.boolean().default(false),
+  hasTouch: yup.boolean().default(false),
+  isLandscape: yup.boolean().default(false),
 })
 
 export type PageViewportOptions = yup.InferType<typeof pageViewportSchema>
 
 export const screenshotSchema = yup.object({
-  type: yup.string<'png' | 'jpeg' | 'webp'>().default('png'),
-  path: yup.string(),
-  quality: yup.number().default(0),
-  fullPage: yup.boolean(),
-  clip: yup
-    .object({
-      x: yup.number().required(),
-      y: yup.number().required(),
-      width: yup.number().required(),
-      height: yup.number().required(),
-    })
-    .default(undefined),
-  omitBackground: yup.boolean(),
-  encoding: yup.string<'binary' | 'base64'>(),
-
-  // Extra options
-  animationTimeout: yup.number().default(0),
+  clip: yup.object({
+    x: yup.number().required(),
+    y: yup.number().required(),
+    width: yup.number().required(),
+    height: yup.number().required(),
+  }).nullable(),
+  encoding: yup.string().oneOf(['base64', 'binary']).default('binary'),
+  fullPage: yup.boolean().default(false),
+  omitBackground: yup.boolean().default(false),
+  path: yup.string().nullable(),
+  quality: yup.number().min(0).max(100).nullable(),
+  type: yup.string().oneOf(['png', 'jpeg', 'webp']).default('png'),
 })
 
 export type ScreenshotOptions = yup.InferType<typeof screenshotSchema>
 
 export const pdfSchema = yup.object({
-  path: yup.string(),
-  scale: yup.number().default(1.0),
-  displayHeaderFooter: yup.boolean(),
-  headerTemplate: yup.string(),
-  footerTemplate: yup.string(),
-  printBackground: yup.boolean(),
-  landscape: yup.boolean(),
-  pageRanges: yup.string(),
-  format: yup.string<PaperFormat>(),
-  width: yup.string(),
-  height: yup.string(),
+  displayHeaderFooter: yup.boolean().default(true),
+  footerTemplate: yup.string().default(''),
+  format: yup.string().default('A4'),
+  headerTemplate: yup.string().default(''),
+  height: yup.string().nullable(),
+  landscape: yup.boolean().default(false),
   margin: yup.object({
-    top: yup.string(),
-    right: yup.string(),
-    bottom: yup.string(),
-    left: yup.string(),
+    top: yup.string().default(''),
+    right: yup.string().default(''),
+    bottom: yup.string().default(''),
+    left: yup.string().default(''),
   }),
-  preferCSSPageSize: yup.boolean(),
+  pageRanges: yup.string().default(''),
+  preferCSSPageSize: yup.boolean().default(false),
+  printBackground: yup.boolean().default(false),
+  scale: yup.number().default(1),
+  width: yup.string().nullable(),
 })
 
 export type PdfOptions = yup.InferType<typeof pdfSchema>
