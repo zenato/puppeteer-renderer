@@ -2,16 +2,19 @@ import { PaperFormat, PuppeteerLifeCycleEvent } from 'puppeteer'
 import * as yup from 'yup'
 
 export const pageSchema = yup.object({
-  timeout: yup.number().default(30 * 1000),
-  waitUntil: yup.string<PuppeteerLifeCycleEvent>().default('networkidle2'),
-  credentials: yup
-    .object({
-      username: yup.string().default(''),
-      password: yup.string().default(''),
-    })
-    .default(undefined),
-  headers: yup.string(),
-  emulateMediaType: yup.string(),
+  headers: yup.object().nullable(),
+  userAgent: yup.string().nullable(),
+  viewport: yup.object({
+    width: yup.number().required(),
+    height: yup.number().required(),
+    deviceScaleFactor: yup.number().default(1),
+    isMobile: yup.boolean().default(false),
+    hasTouch: yup.boolean().default(false),
+    isLandscape: yup.boolean().default(false),
+  }).nullable(),
+  waitUntil: yup.string().oneOf(['load', 'domcontentloaded', 'networkidle0', 'networkidle2']).default('load'),
+  timeout: yup.number().integer().min(0).default(30000),
+  extraTimeout: yup.number().integer().min(0).default(0),
 })
 
 export type PageOptions = yup.InferType<typeof pageSchema>
