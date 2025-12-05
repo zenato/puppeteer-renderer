@@ -1,52 +1,186 @@
-# Puppeteer(Chrome headless node API) based web page renderer
+# Puppeteer Renderer
 
-[Puppeteer](https://github.com/GoogleChrome/puppeteer) (Chrome headless node API) based web page renderer.
+[Puppeteer](https://github.com/puppeteer/puppeteer) (Chrome headless) based web page renderer.
 
-Useful server side rendering through proxy. Outputs HTML, PDF and screenshots as PNG.
+Renders web pages to HTML, PDF, or screenshots (PNG/JPEG/WebP). Supports both GET and POST requests.
 
 ## Requirements
-You can run Chromium or docker.
+
+- Node.js >= 24
+- Chromium or Docker
 
 ## Getting Started
 
-### Start server using docker (If you can not run Chromium and installed docker)
+### Docker
 
 ```bash
 docker run -d --name renderer -p 8080:3000 ghcr.io/zenato/puppeteer-renderer:latest
 ```
 
-### Local (git clone)
+### Local Development
 
-`pnpm install`
+```bash
+pnpm install
+pnpm dev
+```
 
-#### Start server (If you can run Chromium)
-`pnpm dev`
-(service port: 3000)
+Server runs on port 3000 by default.
 
-#### Locally build the image
+### Build Docker Image Locally
 
 ```bash
 docker build . --file ./Dockerfile --tag local/puppeteer-renderer --build-arg SCOPE=puppeteer-renderer
-```
 docker run -d --name renderer -p 8080:3000 local/puppeteer-renderer
 ```
 
-### Test on your browser
-Input url `http://localhost:{port}/{html|pdf|screenshot}?url=https://www.google.com`
+## API Endpoints
 
-If you can see html code, server works fine.
+### Rendering Endpoints
 
-### Puppeteer customization
+These endpoints support both `GET` (query parameters) and `POST` (JSON body).
 
-When starting `pnpm {dev|start}` or docker container you can customize puppeteer using environment variables.
+| Endpoint | Description |
+|----------|-------------|
+| `GET/POST /html` | Renders page and returns HTML |
+| `GET/POST /screenshot` | Captures page screenshot |
+| `GET/POST /pdf` | Generates PDF from page |
 
-- `IGNORE_HTTPS_ERRORS=true` - Ignores HTTPS errors
-- `PUPPETEER_ARGS='--host-rules=MAP localhost yourproxy'` - Ads additional args that will be passed to puppeteer. Supports multiple arguments.
+### Utility Endpoints
 
-## Integration with existing service.
+| Endpoint | Description |
+|----------|-------------|
+| `GET /health` | Health check. Returns `{ "status": "ok" }` |
 
-If you have active service, set proxy configuration with middleware.
-See [puppeteer-renderer-middleware](packages/middleware/README.md) for express.
+## Rendering Options
+
+The following options apply to `/html`, `/screenshot`, and `/pdf` endpoints.
+
+**Note:** For complex options like `headers`, `cookies`, and nested objects, use POST with JSON body. GET requests support dot notation for simple nested values (e.g., `viewport.width=1920`).
+
+### Common Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `url` | string | **required** | Target URL |
+| `timeout` | number | 30000 | Navigation timeout (ms) |
+| `waitUntil` | string | 'networkidle2' | When to consider navigation done |
+| `viewport.width` | number | 800 | Viewport width |
+| `viewport.height` | number | 600 | Viewport height |
+| `device` | string | - | Device emulation (e.g., 'iPhone 14 Pro') |
+| `userAgent` | string | - | Custom user agent |
+| `headers` | object | - | Custom HTTP headers |
+| `cookies` | array | - | Cookies to set |
+| `credentials.username` | string | - | HTTP basic auth username |
+| `credentials.password` | string | - | HTTP basic auth password |
+| `emulateMediaType` | string | - | 'screen' or 'print' |
+| `waitForSelector` | string | - | Wait for element before capture |
+| `waitForSelectorTimeout` | number | 30000 | Selector wait timeout (ms) |
+| `disableCache` | boolean | true | Disable page cache |
+
+## Screenshot Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `type` | string | 'png' | 'png', 'jpeg', or 'webp' |
+| `quality` | number | - | Quality (0-100, jpeg/webp only) |
+| `fullPage` | boolean | false | Capture full page |
+| `clip` | object | - | Clip region `{ x, y, width, height }` |
+| `omitBackground` | boolean | false | Transparent background |
+| `encoding` | string | 'binary' | 'binary' or 'base64' |
+| `animationTimeout` | number | 0 | Wait for animations (ms) |
+
+## PDF Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `filename` | string | - | Custom filename |
+| `contentDisposition` | string | 'attachment' | 'attachment' or 'inline' |
+| `scale` | number | 1.0 | Scale (0.1 - 2.0) |
+| `format` | string | - | Paper format (A4, Letter, etc.) |
+| `landscape` | boolean | false | Landscape orientation |
+| `printBackground` | boolean | false | Print background graphics |
+| `margin` | object | - | Margins `{ top, right, bottom, left }` |
+| `displayHeaderFooter` | boolean | false | Show header/footer |
+| `headerTemplate` | string | - | Header HTML template |
+| `footerTemplate` | string | - | Footer HTML template |
+
+## Usage Examples
+
+### GET Request
+
+```bash
+# HTML
+curl "http://localhost:3000/html?url=https://example.com"
+
+# Screenshot with viewport
+curl "http://localhost:3000/screenshot?url=https://example.com&viewport.width=1920&viewport.height=1080"
+
+# PDF
+curl "http://localhost:3000/pdf?url=https://example.com&filename=report.pdf" -o report.pdf
+```
+
+### POST Request
+
+```bash
+# Screenshot with device emulation
+curl -X POST http://localhost:3000/screenshot \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "device": "iPhone 14 Pro",
+    "fullPage": true,
+    "type": "webp",
+    "quality": 90
+  }' -o screenshot.webp
+
+# PDF with custom headers and cookies
+curl -X POST http://localhost:3000/pdf \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/dashboard",
+    "headers": { "Authorization": "Bearer token123" },
+    "cookies": [{ "name": "session", "value": "abc", "domain": "example.com" }],
+    "printBackground": true,
+    "format": "A4"
+  }' -o dashboard.pdf
+
+# Wait for specific element
+curl -X POST http://localhost:3000/screenshot \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "waitForSelector": "#main-content",
+    "waitForSelectorTimeout": 10000
+  }' -o screenshot.png
+```
+
+## Error Response
+
+All errors return JSON:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "URL is required"
+  }
+}
+```
+
+Error codes: `VALIDATION_ERROR`, `NAVIGATION_ERROR`, `TIMEOUT_ERROR`, `SELECTOR_NOT_FOUND`, `BROWSER_ERROR`, `INTERNAL_ERROR`
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Server port (default: 3000) |
+| `IGNORE_HTTPS_ERRORS` | Set to 'true' to ignore SSL errors |
+| `PUPPETEER_ARGS` | Additional Chromium arguments (separated by `--`) |
+
+## Integration with Express
+
+See [puppeteer-renderer-middleware](packages/middleware/README.md) for integrating with existing Express apps.
 
 ```ts
 import express from 'express'
@@ -55,43 +189,11 @@ import renderer from 'puppeteer-renderer-middleware'
 const app = express()
 
 app.use('/render-proxy', renderer({
-  url: 'http://installed-your-puppeteer-renderer-url',
-  // userAgentPattern: /My-Custom-Agent/i,
-  // excludeUrlPattern: /*.html$/i
-  // timeout: 30 * 1000,
-}));
+  url: 'http://localhost:3000',
+}))
 
-// your service logics..
-
-app.listen(8080);
+app.listen(8080)
 ```
-
-## API
-
-Endpoint: `/{html|pdf|screenshot}`
-
-| Name               | Required |          Value          | Description                                                                                                               | Usage                                                                                  |
-| ------------------ | :------: | :---------------------: | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `url`              |   yes    |                         | Target URL                                                                                                                | `http://puppeteer-renderer/html?url=http://www.google.com`                             |
-| `animationTimeout` |          | Timeout in milliseconds | Waits for animations to finish before taking the screenshot. Only applicable to `type` `screenshot`                       | `http://puppeteer-renderer/screenshot?url=http://www.google.com&animationTimeout=3000` |
-| (Extra options)    |          |                         | Extra options (see [puppeteer API doc](https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagepdfoptions)) | `http://puppeteer-renderer/pdf?url=http://www.google.com&scale=2`                      |
-
-## PDF File Name Convention
-
-Generated PDFs are returned with a `Content-disposition` header requesting the browser to download the file instead of showing it.
-The file name is generated from the URL rendered:
-
-| URL                                            | Filename              |
-| ---------------------------------------------- | --------------------- |
-| `https://www.example.com/`                     | `www.example.com.pdf` |
-| `https://www.example.com:80/`                  | `www.example.com.pdf` |
-| `https://www.example.com/resource`             | `resource.pdf`        |
-| `https://www.example.com/resource.extension`   | `resource.pdf`        |
-| `https://www.example.com/path/`                | `path.pdf`            |
-| `https://www.example.com/path/to/`             | `pathto.pdf`          |
-| `https://www.example.com/path/to/resource`     | `resource.pdf`        |
-| `https://www.example.com/path/to/resource.ext` | `resource.pdf`        |
-
 
 ## License
 

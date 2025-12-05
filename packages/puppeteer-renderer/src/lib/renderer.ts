@@ -1,11 +1,13 @@
-import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer'
-import waitForAnimations from './wait-for-animations'
-import {
-  PageOptions,
-  PageViewportOptions,
-  PdfOptions,
+import puppeteer, { Browser, Page, PuppeteerLaunchOptions, KnownDevices } from 'puppeteer'
+import type {
+  CommonOptions,
+  HtmlOptions,
   ScreenshotOptions,
-} from './validate-schema'
+  PdfOptions,
+  RenderResult,
+} from './types'
+import { Errors } from './errors'
+import waitForAnimations from './wait-for-animations'
 
 export class Renderer {
   private browser: Browser
@@ -14,132 +16,291 @@ export class Renderer {
     this.browser = browser
   }
 
-  async html(url: string, pageOptions: PageOptions) {
-    let page: Page | undefined = undefined
+  /**
+   * HTML 렌더링
+   */
+  async html(options: HtmlOptions): Promise<RenderResult<string>> {
+    const startTime = Date.now()
 
-    try {
-      page = await this.createPage(url, pageOptions)
+    return this.withPage(options, async (page) => {
       const html = await page.content()
-      return html
-    } finally {
-      await this.closePage(page)
-    }
+      return {
+        data: html,
+        duration: Date.now() - startTime,
+      }
+    })
   }
 
-  async pdf(url: string, pageOptions: PageOptions, pdfOptions: PdfOptions) {
-    let page: Page | undefined = undefined
-
-    try {
-      page = await this.createPage(url, {
-        ...pageOptions,
-        emulateMediaType: pageOptions.emulateMediaType || 'print',
-      })
-
-      const buffer = await page.pdf(pdfOptions)
-      return buffer
-    } finally {
-      await this.closePage(page)
-    }
-  }
-
+  /**
+   * 스크린샷 생성
+   */
   async screenshot(
-    url: string,
-    pageOptions: PageOptions,
-    pageViewportOptions: PageViewportOptions,
-    screenshotOptions: ScreenshotOptions
-  ) {
-    let page: Page | undefined = undefined
+    options: ScreenshotOptions,
+  ): Promise<RenderResult<{ buffer: Buffer; type: 'png' | 'jpeg' | 'webp' }>> {
+    const startTime = Date.now()
 
-    try {
-      page = await this.createPage(url, pageOptions)
+    return this.withPage(options, async (page) => {
+      const {
+        type = 'png',
+        quality,
+        fullPage,
+        clip,
+        omitBackground,
+        encoding,
+        animationTimeout = 0,
+        viewport,
+      } = options
 
-      await page.setViewport(pageViewportOptions)
+      // Viewport 설정
+      if (viewport) {
+        await page.setViewport(viewport)
+      }
 
-      const { animationTimeout, ...options } = screenshotOptions
-
+      // 애니메이션 대기
       if (animationTimeout > 0) {
-        await waitForAnimations(page, screenshotOptions, animationTimeout)
+        await waitForAnimations(page, { type, fullPage, clip, omitBackground }, animationTimeout)
       }
 
       const buffer = await page.screenshot({
-        ...options,
-        quality: options.type === 'png' ? undefined : options.quality,
+        type,
+        quality: type === 'png' ? undefined : quality,
+        fullPage,
+        clip,
+        omitBackground,
+        encoding: encoding === 'base64' ? 'base64' : 'binary',
       })
 
       return {
-        type: options.type,
-        buffer,
+        data: {
+          buffer: Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer, 'base64'),
+          type,
+        },
+        duration: Date.now() - startTime,
       }
-    } finally {
-      await this.closePage(page)
-    }
+    })
   }
 
-  async createPage(url: string, pageOptions: PageOptions) {
-    let page: Page | undefined = undefined
+  /**
+   * PDF 생성
+   */
+  async pdf(options: PdfOptions): Promise<RenderResult<Buffer>> {
+    const startTime = Date.now()
+
+    // PDF는 기본적으로 print 미디어 타입 사용
+    const pdfOptions: PdfOptions = {
+      ...options,
+      emulateMediaType: options.emulateMediaType || 'print',
+    }
+
+    return this.withPage(pdfOptions, async (page) => {
+      const {
+        scale,
+        displayHeaderFooter,
+        headerTemplate,
+        footerTemplate,
+        printBackground,
+        landscape,
+        pageRanges,
+        format,
+        paperWidth,
+        paperHeight,
+        margin,
+        preferCSSPageSize,
+        viewport,
+      } = options
+
+      // Viewport 적용
+      if (viewport) {
+        await page.setViewport(viewport)
+      }
+
+      const pdfData = await page.pdf({
+        scale,
+        displayHeaderFooter,
+        headerTemplate,
+        footerTemplate,
+        printBackground,
+        landscape,
+        pageRanges,
+        format,
+        width: paperWidth,
+        height: paperHeight,
+        margin,
+        preferCSSPageSize,
+      })
+
+      return {
+        data: Buffer.from(pdfData),
+        duration: Date.now() - startTime,
+      }
+    })
+  }
+
+  /**
+   * 페이지 생성 및 설정 (핵심 로직)
+   */
+  private async withPage<T>(
+    options: CommonOptions,
+    callback: (page: Page) => Promise<T>,
+  ): Promise<T> {
+    let page: Page | undefined
 
     try {
       page = await this.browser.newPage()
 
-      page.on('error', error => {
-        throw error
+      page.on('error', (error) => {
+        throw Errors.browser(error.message)
       })
 
-      const { credentials, emulateMediaType, headers, ...options } = pageOptions
+      await this.configurePage(page, options)
+      await this.navigateToUrl(page, options)
 
-      headers && (await page.setExtraHTTPHeaders(JSON.parse(headers)))
-      emulateMediaType && (await page.emulateMediaType(emulateMediaType))
-      credentials && (await page.authenticate(credentials))
-
-      await page.setCacheEnabled(false)
-      await page.goto(url, options)
-
-      return page
+      return await callback(page)
     } catch (e) {
-      console.error(e)
-      await this.closePage(page)
+      if (e instanceof Error) {
+        console.error('[Renderer Error]', e.message)
+      }
       throw e
+    } finally {
+      await this.closePage(page)
     }
   }
 
-  async closePage(page?: Page) {
+  /**
+   * 페이지 설정 적용
+   */
+  private async configurePage(page: Page, options: CommonOptions): Promise<void> {
+    const {
+      headers,
+      credentials,
+      cookies,
+      userAgent,
+      viewport,
+      device,
+      emulateMediaType,
+      disableCache = true,
+    } = options
+
+    // 디바이스 에뮬레이션 (device가 있으면 viewport, userAgent 자동 설정)
+    if (device) {
+      const deviceDescriptor = KnownDevices[device as keyof typeof KnownDevices]
+      if (deviceDescriptor) {
+        await page.emulate(deviceDescriptor)
+      }
+    } else {
+      // 수동 viewport 설정
+      if (viewport) {
+        await page.setViewport(viewport)
+      }
+
+      // 수동 userAgent 설정
+      if (userAgent) {
+        await page.setUserAgent(userAgent)
+      }
+    }
+
+    // HTTP 헤더 설정
+    if (headers && typeof headers === 'object') {
+      await page.setExtraHTTPHeaders(headers)
+    }
+
+    // 인증 정보
+    if (credentials) {
+      await page.authenticate(credentials)
+    }
+
+    // 쿠키 설정
+    if (cookies && cookies.length > 0) {
+      await page.setCookie(...cookies)
+    }
+
+    // 미디어 타입 에뮬레이션
+    if (emulateMediaType) {
+      await page.emulateMediaType(emulateMediaType)
+    }
+
+    // 캐시 설정
+    await page.setCacheEnabled(!disableCache)
+  }
+
+  /**
+   * URL 탐색
+   */
+  private async navigateToUrl(page: Page, options: CommonOptions): Promise<void> {
+    const {
+      url,
+      timeout = 30000,
+      waitUntil = 'networkidle2',
+      waitForSelector,
+      waitForSelectorTimeout = 30000,
+    } = options
+
+    try {
+      await page.goto(url, { timeout, waitUntil })
+    } catch (e) {
+      if (e instanceof Error) {
+        if (e.message.includes('timeout') || e.message.includes('Timeout')) {
+          throw Errors.timeout(timeout)
+        }
+        throw Errors.navigation(e.message, url)
+      }
+      throw e
+    }
+
+    // waitForSelector 처리
+    if (waitForSelector) {
+      try {
+        await page.waitForSelector(waitForSelector, { timeout: waitForSelectorTimeout })
+      } catch {
+        throw Errors.selectorNotFound(waitForSelector)
+      }
+    }
+  }
+
+  /**
+   * 페이지 닫기
+   */
+  private async closePage(page?: Page): Promise<void> {
     try {
       if (page && !page.isClosed()) {
         await page.close()
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }
 
-  async close() {
+  /**
+   * 브라우저 종료
+   */
+  async close(): Promise<void> {
     await this.browser.close()
   }
 }
 
-export let renderer: Renderer | undefined = undefined
+// 싱글톤 인스턴스
+export let renderer: Renderer | undefined
 
-export default async function create(options: PuppeteerLaunchOptions = {}) {
-  // Allows custom ars
-  if (typeof options.args === 'undefined' || !(options.args instanceof Array)) {
-    options.args = []
-  }
+export default async function createRenderer(
+  options: PuppeteerLaunchOptions = {},
+): Promise<Renderer> {
+  const args = options.args ?? []
 
-  options.args.push('--no-sandbox')
-
-  // disable cache
-  options.args.push('--disable-dev-shm-usage')
-  options.args.push('--disk-cache-size=0')
-  options.args.push('--aggressive-cache-discard')
+  args.push(
+    '--no-sandbox',
+    '--disable-dev-shm-usage',
+    '--disk-cache-size=0',
+    '--aggressive-cache-discard',
+  )
 
   const browser = await puppeteer.launch({
     ...options,
+    args,
     headless: 'shell',
   })
 
   renderer = new Renderer(browser)
-
-  console.info(`Initialized renderer.`, options)
+  console.info('[Renderer] Initialized', { args })
 
   return renderer
 }

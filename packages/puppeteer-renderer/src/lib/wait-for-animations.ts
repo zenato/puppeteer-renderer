@@ -1,7 +1,7 @@
 import { Page } from 'puppeteer'
 import pixelmatch from 'pixelmatch'
 import { PNG, PNGWithMetadata } from 'pngjs'
-import { ScreenshotOptions } from './validate-schema'
+import type { ScreenshotOptions } from './types'
 
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
