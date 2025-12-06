@@ -1,4 +1,4 @@
-FROM ghcr.io/puppeteer/puppeteer:24.6.0 as base
+FROM ghcr.io/puppeteer/puppeteer:24.32.0 as base
 
 WORKDIR /app
 
@@ -17,9 +17,9 @@ ARG CLEANING_TARGETS="src test .turbo .eslintrc.* jest.config.* tsup.config.* ts
 
 ARG PORT=3000
 ENV PORT=$PORT
+ENV CI=true
 
-RUN corepack enable
-RUN npm install -g turbo
+RUN npm install -g pnpm turbo
 
 FROM base as pruner
 COPY pnpm-lock.yaml .
