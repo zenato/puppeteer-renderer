@@ -19,20 +19,25 @@ const app = express();
 app.use('/render', puppeteerRenderer({
   url: 'http://puppeteer-renderer:3030',
   // userAgentPattern: /My-Custom-Agent/i,
-  // excludeUrlPattern: /*.html$/i
+  // excludeUrlPattern: /\.html$/i,
   // timeout: 30 * 1000,
 }));
 
 // other codes..
 
-app.listen(3030);
+app.listen(3000);
 ```
+
+The middleware handles GET requests on the following routes:
+- `/html` — Returns rendered HTML
+- `/pdf` — Returns rendered PDF
+- `/screenshot` — Returns rendered screenshot
 
 ## Configuration
 
 | Property | Default | Description |
 | -------- | ------- | ----------- |
-| `url` | *Required* | puppeteer-renderer public url |
-| `userAgentPattern` | |Match user agent pattern |
-| `excludeUrlPattern` | |Exclude url pattern |
-| `timeout` | `10 * 1000` | Timeout ms |
+| `url` | *Required* | puppeteer-renderer service URL to proxy requests to |
+| `userAgentPattern` | Common bot user agents | Requests with matching user agent will skip rendering and pass through to `next()` |
+| `excludeUrlPattern` | Common static file extensions | Requests with matching URL will skip rendering and pass through to `next()` |
+| `timeout` | `10000` | Request timeout in milliseconds |
