@@ -25,12 +25,12 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^9.17.0",
+    "eslint": "^9.39.4",
     "eslint-plugin-common": "workspace:*",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.11",
-    "prettier": "^3.4.2",
-    "turbo": "^2.3.3"
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.8.3",
+    "turbo": "^2.9.16"
   },
   "engines": {
     "node": ">=22"
@@ -38,8 +38,7 @@
   "packageManager": "pnpm@10.12.1",
   "pnpm": {
     "overrides": {
-      "qs": ">=6.14.1"
+      "qs": ">=6.15.2"
     }
   }
 }
-

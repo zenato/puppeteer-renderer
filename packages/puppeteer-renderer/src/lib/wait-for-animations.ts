@@ -18,7 +18,7 @@ export default async function waitForAnimations(
 
   while (new Date().getTime() - t0 < timeout) {
     const buffer = await page.screenshot({ ...options, type: 'png' })
-    const current = PNG.sync.read(buffer as Buffer)
+    const current = PNG.sync.read(Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer))
 
     if (previous !== null && previous.data.length === current.data.length) {
       const diff = pixelmatch(previous.data, current.data, null, previous.width, previous.height)
