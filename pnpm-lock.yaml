@@ -92,7 +92,7 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       puppeteer:
-        specifier: ^24.43.1
+        specifier: 24.43.1
         version: 24.43.1(typescript@5.9.3)
       qs:
         specifier: '>=6.15.2'
