@@ -55,7 +55,7 @@ These endpoints support both `GET` (query parameters) and `POST` (JSON body).
 
 The following options apply to `/html`, `/screenshot`, and `/pdf` endpoints.
 
-**Note:** For complex options like `headers`, `cookies`, and nested objects, use POST with JSON body. GET requests support dot notation for simple nested values (e.g., `viewport.width=1920`).
+**Note:** For complex options like `headers`, `cookies`, and nested objects, use POST with JSON body. GET requests support dot notation for simple nested values (e.g., `viewport.width=1920`, `credentials.username=user`).
 
 ### Common Options
 
@@ -152,6 +152,17 @@ curl -X POST http://localhost:3000/screenshot \
     "waitForSelector": "#main-content",
     "waitForSelectorTimeout": 10000
   }' -o screenshot.png
+
+# HTTP Basic Auth (credentials)
+curl -X POST http://localhost:3000/screenshot \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "credentials": { "username": "user", "password": "pass" }
+  }' -o screenshot.png
+
+# Same via GET using dot notation
+curl "http://localhost:3000/screenshot?url=https://example.com&credentials.username=user&credentials.password=pass" -o screenshot.png
 ```
 
 ## Error Response
