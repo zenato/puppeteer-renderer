@@ -64,7 +64,7 @@ app.use(errorHandler)
 async function start() {
   try {
     await createRenderer({
-      ignoreHTTPSErrors: !!process.env.IGNORE_HTTPS_ERRORS,
+      acceptInsecureCerts: !!process.env.IGNORE_HTTPS_ERRORS,
       args: parseArgs(process.env.PUPPETEER_ARGS),
     })
 

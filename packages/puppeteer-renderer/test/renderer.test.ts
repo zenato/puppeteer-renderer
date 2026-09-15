@@ -37,7 +37,7 @@ describe('Renderer', () => {
     expect(result.data.type).toBe('png')
     expect(result.duration).toBeTypeOf('number')
     expect(
-      pixelmatch(expected.data, actual.data, null, expected.width, expected.height),
+      pixelmatch(expected.data, actual.data, undefined, expected.width, expected.height),
     ).not.toBe(0)
   })
 

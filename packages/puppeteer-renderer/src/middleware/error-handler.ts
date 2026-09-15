@@ -17,9 +17,9 @@ export function errorHandler(
   if (err instanceof RenderError) {
     renderError = err
   } else if (err instanceof ZodError) {
-    const firstError = err.errors[0]
+    const firstError = err.issues[0]
     const message = firstError?.message || 'Validation error'
-    renderError = Errors.validation(message, err.errors)
+    renderError = Errors.validation(message, err.issues)
   } else if (err.message?.includes('net::ERR_')) {
     renderError = Errors.navigation(err.message)
   } else if (err.message?.includes('timeout') || err.message?.includes('Timeout')) {

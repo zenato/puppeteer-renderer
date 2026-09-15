@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "target": "es2022",
+    "module": "esnext",
     "sourceMap": true,
     "outDir": "dist",
     "strict": true,
     "noImplicitAny": false,
     "noImplicitThis": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "baseUrl": "."
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0"
   }
 }
