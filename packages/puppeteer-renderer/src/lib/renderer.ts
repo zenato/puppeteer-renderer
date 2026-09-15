@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Page, PuppeteerLaunchOptions, KnownDevices } from 'puppeteer'
+import puppeteer, { Browser, Page, LaunchOptions, KnownDevices } from 'puppeteer'
 import type {
   CommonOptions,
   HtmlOptions,
@@ -72,7 +72,7 @@ export class Renderer {
 
       return {
         data: {
-          buffer: Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer, 'base64'),
+          buffer: typeof buffer === 'string' ? Buffer.from(buffer, 'base64') : Buffer.from(buffer),
           type,
         },
         duration: Date.now() - startTime,
@@ -281,9 +281,7 @@ export class Renderer {
 // 싱글톤 인스턴스
 export let renderer: Renderer | undefined
 
-export default async function createRenderer(
-  options: PuppeteerLaunchOptions = {},
-): Promise<Renderer> {
+export default async function createRenderer(options: LaunchOptions = {}): Promise<Renderer> {
   const args = options.args ?? []
 
   args.push(

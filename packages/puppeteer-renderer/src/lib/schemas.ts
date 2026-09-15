@@ -3,7 +3,7 @@ import type { HtmlOptions, ScreenshotOptions, PdfOptions } from './types'
 
 // URL 검증 및 변환
 const urlSchema = z
-  .string({ required_error: 'URL is required' })
+  .string({ error: (issue) => (issue.input === undefined ? 'URL is required' : undefined) })
   .min(1, 'URL is required')
   .transform((value) => {
     // 프로토콜이 없을 때만 https:// 추가
@@ -34,7 +34,7 @@ const credentialsSchema = z
 
 // Headers 스키마 (객체 또는 JSON 문자열 하위 호환)
 const headersSchema = z
-  .union([z.string(), z.record(z.string())])
+  .union([z.string(), z.record(z.string(), z.string())])
   .optional()
   .transform((value) => {
     if (typeof value === 'string') {

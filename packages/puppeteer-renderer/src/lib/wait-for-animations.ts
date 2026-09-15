@@ -4,13 +4,13 @@ import { PNG, PNGWithMetadata } from 'pngjs'
 import type { ScreenshotOptions } from './types'
 
 async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export default async function waitForAnimations(
   page: Page,
-  options: Omit<ScreenshotOptions, 'animationTimeout'>,
-  timeout = 10000
+  options: Pick<ScreenshotOptions, 'type' | 'fullPage' | 'clip' | 'omitBackground'>,
+  timeout = 10000,
 ) {
   const t0 = new Date().getTime()
 
@@ -21,7 +21,13 @@ export default async function waitForAnimations(
     const current = PNG.sync.read(Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer))
 
     if (previous !== null && previous.data.length === current.data.length) {
-      const diff = pixelmatch(previous.data, current.data, null, previous.width, previous.height)
+      const diff = pixelmatch(
+        previous.data,
+        current.data,
+        undefined,
+        previous.width,
+        previous.height,
+      )
       if (diff === 0) {
         return true
       }

@@ -1,10 +1,10 @@
-import express, { Request, Response, NextFunction } from 'express'
-import contentDisposition from 'content-disposition'
+import express, { Router, Request, Response, NextFunction } from 'express'
+import { create as contentDisposition } from 'content-disposition'
 import { renderer } from './lib/renderer'
 import { parseHtmlOptions, parseScreenshotOptions, parsePdfOptions } from './lib/schemas'
 import { Errors } from './lib/errors'
 
-const router = express.Router()
+const router: Router = express.Router()
 
 /**
  * GET/POST 파라미터 병합 헬퍼
