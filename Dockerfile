@@ -22,7 +22,10 @@ ENV CI=true
 RUN npm install -g pnpm turbo
 
 FROM base as pruner
-COPY pnpm-lock.yaml .
+# package.json is copied alongside the lockfile so that `pnpm fetch` sees the
+# pnpm.overrides config (it is validated against the lockfile) and so that pnpm
+# self-manages to the packageManager version the repo pins.
+COPY pnpm-lock.yaml package.json ./
 RUN pnpm fetch
 ADD . .
 RUN turbo prune --scope=$SCOPE --docker
