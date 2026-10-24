@@ -32,3 +32,24 @@ When changing the `puppeteer` version in `packages/puppeteer-renderer/package.js
   same version**.
 - Keep the `puppeteer` dependency pinned to an exact version (no `^` caret) so the two
   cannot silently diverge.
+
+### Temporary Node.js security override in the `Dockerfile`
+
+The puppeteer base image pins a `node:24-bookworm` digest at release time, so its Node.js
+can lag behind Node.js security releases even when the puppeteer tag is current. The
+`Dockerfile` therefore has a `node-patched` stage that copies the Node.js binary from the
+official `node:<NODE_PATCH_VERSION>-bookworm` image over the base image's one.
+
+When bumping `puppeteer` and the base image tag, check which Node.js the new base image
+ships (no pull needed):
+
+```sh
+docker buildx imagetools inspect ghcr.io/puppeteer/puppeteer:<version> \
+  --format '{{json .Image}}' | tr ',' '\n' | grep NODE_VERSION
+```
+
+- If it is **at or above** `NODE_PATCH_VERSION`, remove the `node-patched` stage, the
+  `COPY --from=node-patched` lines, and the `NODE_PATCH_VERSION` args, and delete this
+  section.
+- If a new Node.js security release lands first, raise `NODE_PATCH_VERSION` to the fixed
+  24.x version instead.
