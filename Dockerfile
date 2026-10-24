@@ -13,10 +13,12 @@ WORKDIR /app
 
 USER root
 
-# Replace the base image's Node.js binary (and matching headers) with the patched build.
+# Replace the base image's Node.js binary (and matching headers) with the patched build,
+# and keep the inherited NODE_VERSION metadata in line with what is actually installed.
 ARG NODE_PATCH_VERSION
 COPY --from=node-patched /usr/local/bin/node /usr/local/bin/node
 COPY --from=node-patched /usr/local/include/node /usr/local/include/node
+ENV NODE_VERSION=${NODE_PATCH_VERSION}
 RUN test "$(node --version)" = "v${NODE_PATCH_VERSION}"
 
 RUN apt-get update && \
