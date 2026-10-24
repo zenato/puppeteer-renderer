@@ -1,8 +1,23 @@
+# Patched Node.js runtime. The puppeteer base image pins its own `node:24-bookworm`
+# digest at release time, so it lags behind Node.js security releases: every image up
+# to 25.16.0 still ships Node 24.21.0 or older, which is affected by the October 2026
+# Node.js security release (CVE-2026-111497 Brotli decoder out-of-bounds write and
+# nine others). Until the base image ships Node >= 24.22.1, the runtime binary is
+# taken from the official patched image instead. See CLAUDE.md for when to remove it.
+ARG NODE_PATCH_VERSION=24.22.1
+FROM node:${NODE_PATCH_VERSION}-bookworm as node-patched
+
 FROM ghcr.io/puppeteer/puppeteer:25.11.0 as base
 
 WORKDIR /app
 
 USER root
+
+# Replace the base image's Node.js binary (and matching headers) with the patched build.
+ARG NODE_PATCH_VERSION
+COPY --from=node-patched /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-patched /usr/local/include/node /usr/local/include/node
+RUN test "$(node --version)" = "v${NODE_PATCH_VERSION}"
 
 RUN apt-get update && \
     apt-get install -y tini && \
