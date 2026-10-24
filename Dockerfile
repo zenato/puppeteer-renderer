@@ -7,7 +7,7 @@
 ARG NODE_PATCH_VERSION=24.22.1
 FROM node:${NODE_PATCH_VERSION}-bookworm as node-patched
 
-FROM ghcr.io/puppeteer/puppeteer:25.11.0 as base
+FROM ghcr.io/puppeteer/puppeteer:25.16.0 as base
 
 WORKDIR /app
 

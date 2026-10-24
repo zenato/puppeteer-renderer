@@ -25,12 +25,12 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^10.10.0",
+    "eslint": "^10.13.0",
     "eslint-plugin-common": "workspace:*",
     "husky": "^9.1.7",
-    "lint-staged": "^17.5.1",
-    "prettier": "^3.9.6",
-    "turbo": "^2.10.13"
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "turbo": "^2.11.10"
   },
   "engines": {
     "node": ">=22"
